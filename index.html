@@ -2,813 +2,555 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ordem de Serviço</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>OS Manager</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f0f13;
-    --surface: #17171e;
-    --surface2: #1e1e28;
-    --border: rgba(255,255,255,0.07);
-    --border-active: rgba(99,201,255,0.4);
-    --accent: #63c9ff;
-    --accent2: #a78bfa;
-    --text: #f0f0f5;
-    --muted: #888899;
-    --success: #34d399;
-    --warning: #fbbf24;
-    --danger: #f87171;
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    min-height: 100vh;
-    line-height: 1.6;
-  }
-
-  /* HEADER */
-  header {
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-    background: var(--surface);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 20px;
-    letter-spacing: -0.5px;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .logo-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 12px var(--accent);
-  }
-
-  .header-actions { display: flex; gap: 10px; align-items: center; }
-
-  /* TABS */
-  .tabs {
-    display: flex;
-    gap: 2px;
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    background: var(--surface);
-  }
-
-  .tab {
-    padding: 14px 20px;
-    cursor: pointer;
-    font-family: 'Syne', sans-serif;
-    font-weight: 500;
-    font-size: 13px;
-    letter-spacing: 0.3px;
-    color: var(--muted);
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    user-select: none;
-  }
-
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* MAIN */
-  main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
-
-  /* SECTION */
-  .section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-  }
-
-  .section-header {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-icon {
-    width: 32px; height: 32px;
-    border-radius: var(--radius-sm);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
-  }
-
-  .section-icon.blue { background: rgba(99,201,255,0.12); color: var(--accent); }
-  .section-icon.purple { background: rgba(167,139,250,0.12); color: var(--accent2); }
-  .section-icon.green { background: rgba(52,211,153,0.12); color: var(--success); }
-  .section-icon.amber { background: rgba(251,191,36,0.12); color: var(--warning); }
-
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 0.2px;
-  }
-
-  .section-body { padding: 24px; }
-
-  /* GRID */
-  .grid { display: grid; gap: 16px; }
-  .grid-2 { grid-template-columns: 1fr 1fr; }
-  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-  .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-  .col-span-2 { grid-column: span 2; }
-  .col-span-3 { grid-column: span 3; }
-  .col-span-4 { grid-column: span 4; }
-
-  /* FORM FIELDS */
-  .field { display: flex; flex-direction: column; gap: 6px; }
-
-  .field label {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .input-wrap { position: relative; }
-
-  .field input,
-  .field select,
-  .field textarea {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-    appearance: none;
-  }
-
-  .field input:focus,
-  .field select:focus,
-  .field textarea:focus {
-    border-color: var(--border-active);
-    box-shadow: 0 0 0 3px rgba(99,201,255,0.08);
-  }
-
-  .field input.loading { padding-right: 40px; }
-  .field input.success { border-color: rgba(52,211,153,0.5); }
-  .field input.error { border-color: rgba(248,113,113,0.5); }
-
-  .field-status {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-  }
-
-  .field textarea { min-height: 80px; resize: vertical; }
-
-  .field select option { background: var(--surface2); }
-
-  .field-hint {
-    font-size: 11px;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .field-hint.success { color: var(--success); }
-  .field-hint.error { color: var(--danger); }
-
-  /* BUTTONS */
-  .btn {
-    padding: 10px 20px;
-    border-radius: var(--radius-sm);
-    border: none;
-    cursor: pointer;
-    font-family: 'Syne', sans-serif;
-    font-weight: 600;
-    font-size: 13px;
-    letter-spacing: 0.3px;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .btn-primary {
-    background: var(--accent);
-    color: #0a0a12;
-  }
-  .btn-primary:hover { background: #89d8ff; transform: translateY(-1px); }
-
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
-  .btn-secondary:hover { border-color: var(--border-active); color: var(--text); }
-
-  .btn-success {
-    background: var(--success);
-    color: #0a1a12;
-  }
-  .btn-success:hover { filter: brightness(1.1); }
-
-  .btn-danger {
-    background: transparent;
-    border: 1px solid rgba(248,113,113,0.3);
-    color: var(--danger);
-  }
-  .btn-danger:hover { background: rgba(248,113,113,0.08); }
-
-  .btn-lg { padding: 14px 28px; font-size: 15px; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
-
-  /* ITEMS TABLE */
-  .items-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .items-table th {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .items-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-  }
-
-  .items-table tr:last-child td { border-bottom: none; }
-
-  .items-table input {
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    width: 100%;
-    outline: none;
-    padding: 4px;
-  }
-
-  .items-table input:focus {
-    background: var(--surface2);
-    border-radius: 4px;
-    padding: 4px 8px;
-  }
-
-  .add-item-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--accent);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 12px 24px;
-    transition: opacity 0.2s;
-    background: none;
-    border: none;
-    border-top: 1px solid var(--border);
-    width: 100%;
-  }
-
-  .add-item-btn:hover { opacity: 0.7; }
-
-  /* TOTALS */
-  .totals-box {
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 20px;
-  }
-
-  .total-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    font-size: 14px;
-    color: var(--muted);
-  }
-
-  .total-row.grand {
-    border-top: 1px solid var(--border);
-    margin-top: 10px;
-    padding-top: 14px;
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-  }
-
-  .total-row span:last-child { color: var(--text); }
-  .total-row.grand span:last-child { color: var(--accent); }
-
-  /* STATUS BADGE */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    border-radius: 100px;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-  }
-
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
-  .badge.open { background: rgba(99,201,255,0.1); color: var(--accent); }
-  .badge.open .badge-dot { background: var(--accent); }
-  .badge.progress { background: rgba(251,191,36,0.1); color: var(--warning); }
-  .badge.progress .badge-dot { background: var(--warning); }
-  .badge.done { background: rgba(52,211,153,0.1); color: var(--success); }
-  .badge.done .badge-dot { background: var(--success); }
-  .badge.cancelled { background: rgba(248,113,113,0.1); color: var(--danger); }
-  .badge.cancelled .badge-dot { background: var(--danger); }
-
-  /* OS LIST TABLE */
-  .os-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .os-table th {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 14px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .os-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-  }
-
-  .os-table tr:last-child td { border-bottom: none; }
-
-  .os-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-  /* TOAST */
-  #toast-container {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .toast {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    animation: slideIn 0.3s ease;
-    min-width: 280px;
-  }
-
-  .toast.success { border-left: 3px solid var(--success); }
-  .toast.error { border-left: 3px solid var(--danger); }
-  .toast.info { border-left: 3px solid var(--accent); }
-
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  /* SPINNER */
-  .spinner {
-    width: 16px; height: 16px;
-    border: 2px solid rgba(99,201,255,0.2);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    display: inline-block;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* LOADER OVERLAY */
-  #loader {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15,15,19,0.8);
-    z-index: 999;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  #loader.show { display: flex; }
-
-  .loader-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    color: var(--accent);
-    letter-spacing: 0.5px;
-  }
-
-  /* DIVIDER */
-  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
-
-  /* FLEX UTILS */
-  .flex { display: flex; }
-  .items-center { align-items: center; }
-  .justify-between { justify-content: space-between; }
-  .gap-2 { gap: 8px; }
-  .gap-3 { gap: 12px; }
-  .gap-4 { gap: 16px; }
-  .mt-2 { margin-top: 8px; }
-  .mt-4 { margin-top: 16px; }
-
-  /* NUMBER OS */
-  .os-number-display {
-    background: linear-gradient(135deg, rgba(99,201,255,0.1), rgba(167,139,250,0.1));
-    border: 1px solid rgba(99,201,255,0.2);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-  }
-
-  .os-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--accent);
-    letter-spacing: -1px;
-  }
-
-  .os-num-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-
-  /* EMPTY STATE */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted);
-  }
-
-  .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.3; }
-
-  /* SEARCH BAR */
-  .search-bar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .search-bar input {
-    flex: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 16px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    outline: none;
-  }
-
-  .search-bar input:focus { border-color: var(--border-active); }
-
-  /* CONFIG SECTION */
-  .config-box {
-    background: rgba(99,201,255,0.05);
-    border: 1px solid rgba(99,201,255,0.15);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-bottom: 24px;
-  }
-
-  .config-box h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--accent);
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  @media (max-width: 768px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    .col-span-2, .col-span-3, .col-span-4 { grid-column: span 1; }
-    main { padding: 1rem; }
-    header { padding: 0 1rem; }
-    .tabs { padding: 0 1rem; overflow-x: auto; }
-  }
+:root{
+  --bg:#0c0c10;--surf:#14141c;--surf2:#1c1c26;--surf3:#222230;
+  --border:rgba(255,255,255,0.07);--ba:rgba(99,201,255,0.35);
+  --acc:#63c9ff;--acc2:#a78bfa;--acc3:#34d399;
+  --txt:#eeeef5;--mut:#7878a0;
+  --ok:#34d399;--warn:#fbbf24;--err:#f87171;
+  --r:14px;--rs:9px;--rx:20px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+
+/* NAV BOTTOM MOBILE */
+#bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:rgba(20,20,28,0.96);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding:8px 0 calc(8px + var(--safe-bottom));
+  z-index:200;
+  display:grid;grid-template-columns:repeat(5,1fr);
+}
+.bnav-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 4px;cursor:pointer;transition:all .2s;
+  font-size:10px;color:var(--mut);font-family:'Syne',sans-serif;font-weight:600;letter-spacing:.3px;
+}
+.bnav-item.active{color:var(--acc)}
+.bnav-icon{font-size:22px;line-height:1}
+
+/* HEADER */
+header{
+  background:rgba(20,20,28,0.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:150;
+}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px}
+.logo-pulse{width:8px;height:8px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(99,201,255,.4)}50%{box-shadow:0 0 0 6px rgba(99,201,255,0)}}
+.header-right{display:flex;align-items:center;gap:8px}
+
+/* DESKTOP TABS */
+#desktop-tabs{
+  display:flex;gap:2px;border-bottom:1px solid var(--border);
+  padding:0 20px;background:var(--surf);overflow-x:auto;
+  scrollbar-width:none;
+}
+#desktop-tabs::-webkit-scrollbar{display:none}
+.dtab{
+  padding:13px 18px;cursor:pointer;white-space:nowrap;
+  font-family:'Syne',sans-serif;font-weight:600;font-size:12px;
+  letter-spacing:.4px;color:var(--mut);text-transform:uppercase;
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.dtab:hover{color:var(--txt)}
+.dtab.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* PAGES */
+.page{display:none;padding:16px 16px calc(90px + var(--safe-bottom)) 16px;max-width:900px;margin:0 auto}
+.page.active{display:block}
+@media(min-width:768px){
+  .page{padding:24px 24px 40px 24px}
+  #bottom-nav{display:none!important}
+  #desktop-tabs{display:flex!important}
+}
+@media(max-width:767px){
+  #desktop-tabs{display:none!important}
+  body{padding-bottom:0}
+}
+
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.card-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-icon{width:30px;height:30px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ci-blue{background:rgba(99,201,255,.12);color:var(--acc)}
+.ci-purple{background:rgba(167,139,250,.12);color:var(--acc2)}
+.ci-green{background:rgba(52,211,153,.12);color:var(--ok)}
+.ci-amber{background:rgba(251,191,36,.12);color:var(--warn)}
+.ci-red{background:rgba(248,113,113,.12);color:var(--err)}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:.2px;flex:1}
+.card-body{padding:16px}
+
+/* OS NUMBER HERO */
+.os-hero{
+  background:linear-gradient(135deg,rgba(99,201,255,.08),rgba(167,139,250,.08));
+  border:1px solid rgba(99,201,255,.15);border-radius:var(--r);
+  padding:16px;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.os-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--acc);letter-spacing:-1px}
+.os-num-label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.os-hero-right{display:flex;gap:10px;flex-wrap:wrap}
+
+/* FIELDS */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:500;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.input-wrap{position:relative}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--surf2);border:1px solid var(--border);
+  border-radius:var(--rs);padding:11px 14px;color:var(--txt);
+  font-family:'DM Sans',sans-serif;font-size:14px;outline:none;
+  transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--ba);box-shadow:0 0 0 3px rgba(99,201,255,.07);
+}
+.field input.ok{border-color:rgba(52,211,153,.5)}
+.field input.err{border-color:rgba(248,113,113,.5)}
+.fstatus{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+.field textarea{min-height:72px;resize:vertical;padding:10px 14px}
+.field select option{background:var(--surf2);color:var(--txt)}
+.fhint{font-size:11px;color:var(--mut);min-height:14px}
+.fhint.ok{color:var(--ok)}
+.fhint.err{color:var(--err)}
+
+/* GRID */
+.g{display:grid;gap:12px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g4{grid-template-columns:1fr 1fr 1fr 1fr}
+.s2{grid-column:span 2}
+.s3{grid-column:span 3}
+.s4{grid-column:span 4}
+@media(max-width:600px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .s2,.s3,.s4{grid-column:span 1}
+  .g2.keep{grid-template-columns:1fr 1fr}
+}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 18px;border-radius:var(--rs);border:none;cursor:pointer;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:12px;letter-spacing:.3px;
+  transition:all .18s;white-space:nowrap;text-transform:uppercase;
+}
+.btn-primary{background:var(--acc);color:#060c14}
+.btn-primary:hover{background:#89d8ff;transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--mut)}
+.btn-ghost:hover{border-color:var(--ba);color:var(--txt)}
+.btn-ok{background:var(--ok);color:#041a0f}
+.btn-ok:hover{filter:brightness(1.1)}
+.btn-warn{background:var(--warn);color:#1a0f00}
+.btn-purple{background:var(--acc2);color:#0c0820}
+.btn-purple:hover{filter:brightness(1.1)}
+.btn-danger{background:transparent;border:1px solid rgba(248,113,113,.3);color:var(--err)}
+.btn-danger:hover{background:rgba(248,113,113,.08)}
+.btn-sm{padding:7px 13px;font-size:11px}
+.btn-lg{padding:13px 24px;font-size:13px;border-radius:var(--r)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-full{width:100%}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:var(--rs)}
+
+/* FAB */
+.fab{
+  position:fixed;bottom:calc(72px + var(--safe-bottom));right:16px;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--acc);color:#060c14;border:none;cursor:pointer;
+  font-size:24px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(99,201,255,.3);z-index:190;
+  transition:all .2s;font-weight:bold;
+}
+.fab:hover{transform:scale(1.1)}
+@media(min-width:768px){.fab{display:none}}
+
+/* ITEMS TABLE */
+.items-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.items{width:100%;border-collapse:collapse;min-width:480px}
+table.items th{font-size:10px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;padding:10px 10px;text-align:left;border-bottom:1px solid var(--border)}
+table.items td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.items tr:last-child td{border-bottom:none}
+table.items input,table.items select{background:transparent;border:none;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:13px;width:100%;outline:none;padding:3px}
+table.items input:focus,table.items select:focus{background:var(--surf3);border-radius:4px;padding:3px 7px}
+table.items select option{background:var(--surf2)}
+.add-row{display:flex;align-items:center;gap:8px;color:var(--acc);cursor:pointer;font-size:13px;font-weight:500;padding:12px 16px;border:none;background:none;border-top:1px solid var(--border);width:100%;transition:opacity .2s}
+.add-row:hover{opacity:.7}
+
+/* MOBILE ITEMS CARDS */
+.item-card-m{
+  background:var(--surf2);border:1px solid var(--border);border-radius:var(--rs);
+  padding:12px;margin-bottom:10px;
+}
+.item-card-m-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+.item-card-m select{background:var(--surf3);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-size:13px;padding:6px 8px;flex:1;outline:none;font-family:'DM Sans',sans-serif}
+.item-card-m input{background:var(--surf3);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-size:13px;padding:6px 8px;outline:none;font-family:'DM Sans',sans-serif}
+.item-card-m-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end}
+.item-card-m-sub{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+
+/* TOTALS */
+.totals{background:var(--surf2);border-radius:var(--rs);padding:16px}
+.tr{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;color:var(--mut)}
+.tr span:last-child{color:var(--txt);font-weight:500}
+.tr.grand{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--txt)}
+.tr.grand span:last-child{color:var(--acc);font-size:20px}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.bdot{width:5px;height:5px;border-radius:50%}
+.b-open{background:rgba(99,201,255,.12);color:var(--acc)}.b-open .bdot{background:var(--acc)}
+.b-prog{background:rgba(251,191,36,.12);color:var(--warn)}.b-prog .bdot{background:var(--warn)}
+.b-done{background:rgba(52,211,153,.12);color:var(--ok)}.b-done .bdot{background:var(--ok)}
+.b-cancel{background:rgba(248,113,113,.12);color:var(--err)}.b-cancel .bdot{background:var(--err)}
+
+/* LIST ROWS */
+.os-row{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;
+}
+.os-row:last-child{border-bottom:none}
+.os-row:hover{background:rgba(255,255,255,.02)}
+.os-row-main{flex:1;min-width:0}
+.os-row-num{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--acc);margin-bottom:2px}
+.os-row-cli{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.os-row-equip{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.os-row-right{text-align:right;flex-shrink:0}
+.os-row-val{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--ok);margin-bottom:4px}
+
+/* CLIENT ROW */
+.cli-row{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;
+}
+.cli-row:last-child{border-bottom:none}
+.cli-row:hover{background:rgba(99,201,255,.04)}
+.cli-avatar{width:38px;height:38px;border-radius:50%;background:rgba(99,201,255,.12);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--acc);flex-shrink:0}
+.cli-info{flex:1;min-width:0}
+.cli-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cli-doc{font-size:11px;color:var(--mut)}
+
+/* SERVICE CATALOG */
+.cat-row{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  border-bottom:1px solid var(--border);
+}
+.cat-row:last-child{border-bottom:none}
+.cat-info{flex:1;min-width:0}
+.cat-name{font-size:14px;font-weight:500}
+.cat-tipo{font-size:11px;color:var(--mut)}
+.cat-price{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--ok);flex-shrink:0;margin-right:8px}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:flex-end;justify-content:center}
+.modal-bg.show{display:flex}
+@media(min-width:600px){.modal-bg.show{align-items:center}}
+.modal{
+  background:var(--surf);border:1px solid var(--border);
+  border-radius:var(--r) var(--r) 0 0;
+  width:100%;max-width:560px;max-height:92vh;overflow-y:auto;
+  padding:20px;
+  animation:slideUp .25s ease;
+}
+@media(min-width:600px){.modal{border-radius:var(--r)}}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--surf2);border:none;color:var(--mut);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{color:var(--txt)}
+
+/* SHARE ACTIONS */
+.share-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
+.share-btn{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:16px 8px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surf2);cursor:pointer;transition:all .2s;
+  font-size:11px;font-family:'Syne',sans-serif;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.3px;
+}
+.share-btn:hover{border-color:var(--ba);color:var(--txt)}
+.share-btn .share-icon{font-size:28px}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:var(--rs);padding:11px 14px 11px 40px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--ba)}
+.search-wrap::before{content:'🔍';position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px}
+
+/* TOAST */
+#toasts{position:fixed;top:70px;right:12px;left:12px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+@media(min-width:500px){#toasts{left:auto;width:300px}}
+.toast{background:var(--surf2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 16px;display:flex;align-items:center;gap:9px;font-size:13px;animation:slideIn .3s ease;pointer-events:auto}
+.toast.ok{border-left:3px solid var(--ok)}.toast.err{border-left:3px solid var(--err)}.toast.info{border-left:3px solid var(--acc)}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* LOADER */
+#loader{display:none;position:fixed;inset:0;background:rgba(12,12,16,.85);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#loader.show{display:flex}
+.spin{width:36px;height:36px;border:3px solid rgba(99,201,255,.15);border-top-color:var(--acc);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-txt{font-family:'Syne',sans-serif;font-size:13px;color:var(--acc);letter-spacing:.5px}
+
+/* SECTION TITLE */
+.section-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--mut);margin-bottom:10px;margin-top:4px}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:50px 20px;color:var(--mut)}
+.empty-ico{font-size:44px;margin-bottom:10px;opacity:.3}
+.empty-txt{font-family:'Syne',sans-serif;font-weight:600;font-size:14px;margin-bottom:5px;color:var(--txt)}
+.empty-sub{font-size:12px}
+
+/* DISC INPUT */
+.disc-input{
+  display:flex;align-items:center;gap:6px;
+}
+.disc-input input{width:65px;background:var(--surf2);border:1px solid var(--border);border-radius:6px;color:var(--txt);font-size:13px;padding:6px 8px;text-align:right;outline:none}
+.disc-input input:focus{border-color:var(--ba)}
+
+/* QUICK SELECT SERVICE */
+.quick-services{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.qs-chip{
+  padding:5px 11px;border-radius:100px;font-size:12px;font-weight:500;
+  border:1px solid var(--border);background:var(--surf2);color:var(--mut);
+  cursor:pointer;transition:all .15s;
+}
+.qs-chip:hover,.qs-chip.sel{border-color:var(--acc);color:var(--acc);background:rgba(99,201,255,.08)}
+
+/* CONFIG INFO BOX */
+.info-box{background:rgba(99,201,255,.05);border:1px solid rgba(99,201,255,.12);border-radius:var(--rs);padding:14px 16px;margin-bottom:14px}
+.info-box h4{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+
+/* PRINT PREVIEW */
+#print-area{display:none}
+@media print{
+  body>*{display:none!important}
+  #print-area{display:block!important;font-family:Arial,sans-serif;font-size:12px;color:#111;padding:20px}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+
+/* SWIPE hint */
+.swipe-hint{font-size:11px;color:var(--mut);text-align:center;padding:6px;display:none}
+@media(max-width:767px){.swipe-hint{display:block}}
 </style>
 </head>
 <body>
 
-<div id="loader">
-  <div class="spinner" style="width:40px;height:40px;border-width:3px;"></div>
-  <div class="loader-text" id="loader-text">Salvando...</div>
-</div>
+<div id="loader"><div class="spin"></div><div class="loader-txt" id="ltxt">Carregando...</div></div>
+<div id="toasts"></div>
 
-<div id="toast-container"></div>
+<!-- PRINT AREA (oculto) -->
+<div id="print-area"></div>
 
 <header>
-  <div class="logo">
-    <div class="logo-dot"></div>
-    OS Manager
-  </div>
-  <div class="header-actions">
-    <span style="font-size:12px;color:var(--muted);" id="header-empresa">Sua Empresa</span>
-    <button class="btn btn-secondary" onclick="switchTab('config')">⚙ Config</button>
-    <button class="btn btn-primary" onclick="novaOS()">+ Nova OS</button>
+  <div class="logo"><div class="logo-pulse"></div><span id="h-empresa">OS Manager</span></div>
+  <div class="header-right">
+    <button class="btn btn-ghost btn-sm" onclick="novaOS()">＋ Nova OS</button>
   </div>
 </header>
 
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('nova')" id="tab-nova">Nova OS</div>
-  <div class="tab" onclick="switchTab('lista')" id="tab-lista">Ordens de Serviço</div>
-  <div class="tab" onclick="switchTab('config')" id="tab-config">Configurações</div>
+<!-- DESKTOP TABS -->
+<div id="desktop-tabs">
+  <div class="dtab active" onclick="goPage('p-nova')" id="dt-p-nova">📋 Nova OS</div>
+  <div class="dtab" onclick="goPage('p-lista')" id="dt-p-lista">📂 Ordens</div>
+  <div class="dtab" onclick="goPage('p-clientes')" id="dt-p-clientes">👥 Clientes</div>
+  <div class="dtab" onclick="goPage('p-catalogo')" id="dt-p-catalogo">🛠 Catálogo</div>
+  <div class="dtab" onclick="goPage('p-config')" id="dt-p-config">⚙ Config</div>
 </div>
 
-<main>
+<!-- =============================== PAGE: NOVA OS =============================== -->
+<div class="page active" id="p-nova">
 
-  <!-- ===== TAB: NOVA OS ===== -->
-  <div class="tab-content active" id="content-nova">
-
-    <div class="os-number-display">
-      <div>
-        <div class="os-num-label">Número da OS</div>
-        <div class="os-num" id="os-numero">#00001</div>
+  <div class="os-hero">
+    <div>
+      <div class="os-num-label">Ordem de Serviço</div>
+      <div class="os-num" id="os-num">#OS-00001</div>
+    </div>
+    <div class="os-hero-right">
+      <div class="field">
+        <label>Status</label>
+        <select id="os-status" style="min-width:130px">
+          <option>Aberta</option><option>Em andamento</option><option>Concluída</option><option>Cancelada</option>
+        </select>
       </div>
-      <div class="flex gap-2">
-        <div class="field" style="min-width:160px;">
-          <label>Status</label>
-          <select id="os-status">
-            <option value="Aberta">Aberta</option>
-            <option value="Em andamento">Em andamento</option>
-            <option value="Concluída">Concluída</option>
-            <option value="Cancelada">Cancelada</option>
+      <div class="field">
+        <label>Data</label>
+        <input type="date" id="os-data" style="min-width:140px">
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTE -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon ci-blue">👤</div>
+      <div class="card-title">Cliente</div>
+      <button class="btn btn-ghost btn-sm" onclick="abrirModalCliente()">📂 Buscar</button>
+    </div>
+    <div class="card-body">
+      <div class="g g2" style="margin-bottom:12px">
+        <div class="field">
+          <label>Tipo</label>
+          <select id="tipo-pessoa" onchange="toggleTipo()">
+            <option value="fisica">Pessoa Física (CPF)</option>
+            <option value="juridica">Pessoa Jurídica (CNPJ)</option>
           </select>
         </div>
-        <div class="field" style="min-width:160px;">
-          <label>Data de Abertura</label>
-          <input type="date" id="os-data-abertura">
+        <div class="field" id="f-cpf">
+          <label>CPF</label>
+          <div class="input-wrap">
+            <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric"
+              oninput="mCPF(this)" onblur="vCPF()">
+            <span class="fstatus" id="st-cpf"></span>
+          </div>
+          <div class="fhint" id="h-cpf"></div>
+        </div>
+        <div class="field" id="f-cnpj" style="display:none">
+          <label>CNPJ</label>
+          <div class="input-wrap">
+            <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18" inputmode="numeric"
+              oninput="mCNPJ(this)" onblur="bCNPJ()">
+            <span class="fstatus" id="st-cnpj"></span>
+          </div>
+          <div class="fhint" id="h-cnpj"></div>
+        </div>
+      </div>
+      <div class="g g2">
+        <div class="field s2">
+          <label>Nome / Razão Social</label>
+          <input type="text" id="cli-nome" placeholder="Nome completo">
+        </div>
+        <div class="field">
+          <label>Telefone / WhatsApp</label>
+          <input type="tel" id="cli-tel" placeholder="(00) 00000-0000" maxlength="15" oninput="mTel(this)">
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="cli-email" placeholder="email@exemplo.com">
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- CLIENTE -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon blue">👤</div>
-        <div class="section-title">Dados do Cliente</div>
-      </div>
-      <div class="section-body">
-        <div class="grid grid-3" style="margin-bottom:16px;">
-          <div class="field">
-            <label>Tipo de Pessoa</label>
-            <select id="tipo-pessoa" onchange="toggleTipoPessoa()">
-              <option value="fisica">Pessoa Física (CPF)</option>
-              <option value="juridica">Pessoa Jurídica (CNPJ)</option>
-            </select>
+  <!-- ENDEREÇO -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon ci-purple">📍</div><div class="card-title">Endereço</div></div>
+    <div class="card-body">
+      <div class="g g4" style="margin-bottom:12px">
+        <div class="field">
+          <label>CEP</label>
+          <div class="input-wrap">
+            <input type="text" id="cep" placeholder="00000-000" maxlength="9" inputmode="numeric"
+              oninput="mCEP(this)" onblur="bCEP()">
+            <span class="fstatus" id="st-cep"></span>
           </div>
-
-          <div class="field" id="field-cpf">
-            <label>CPF</label>
-            <div class="input-wrap">
-              <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14"
-                oninput="maskCPF(this)" onblur="buscarCPF()">
-              <span class="field-status" id="status-cpf"></span>
-            </div>
-            <div class="field-hint" id="hint-cpf"></div>
-          </div>
-
-          <div class="field" id="field-cnpj" style="display:none;">
-            <label>CNPJ</label>
-            <div class="input-wrap">
-              <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18"
-                oninput="maskCNPJ(this)" onblur="buscarCNPJ()">
-              <span class="field-status" id="status-cnpj"></span>
-            </div>
-            <div class="field-hint" id="hint-cnpj"></div>
-          </div>
+          <div class="fhint" id="h-cep"></div>
         </div>
-
-        <div class="grid grid-3">
-          <div class="field col-span-2">
-            <label>Nome / Razão Social</label>
-            <input type="text" id="cliente-nome" placeholder="Nome completo ou razão social">
-          </div>
-          <div class="field">
-            <label>Telefone / WhatsApp</label>
-            <input type="text" id="cliente-tel" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)">
-          </div>
-          <div class="field col-span-2">
-            <label>E-mail</label>
-            <input type="email" id="cliente-email" placeholder="email@exemplo.com">
-          </div>
-          <div class="field" id="field-ie" style="display:none;">
-            <label>Inscrição Estadual</label>
-            <input type="text" id="cliente-ie" placeholder="IE">
-          </div>
+        <div class="field s2"><label>Logradouro</label><input type="text" id="end-rua"></div>
+        <div class="field"><label>Número</label><input type="text" id="end-num" inputmode="numeric"></div>
+      </div>
+      <div class="g g4">
+        <div class="field"><label>Complemento</label><input type="text" id="end-comp"></div>
+        <div class="field"><label>Bairro</label><input type="text" id="end-bairro"></div>
+        <div class="field"><label>Cidade</label><input type="text" id="end-cidade"></div>
+        <div class="field"><label>UF</label>
+          <select id="end-uf">
+            <option value="">--</option>
+            <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+          </select>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- ENDEREÇO -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon purple">📍</div>
-        <div class="section-title">Endereço</div>
-      </div>
-      <div class="section-body">
-        <div class="grid grid-4">
-          <div class="field">
-            <label>CEP</label>
-            <div class="input-wrap">
-              <input type="text" id="cep" placeholder="00000-000" maxlength="9"
-                oninput="maskCEP(this)" onblur="buscarCEP()">
-              <span class="field-status" id="status-cep"></span>
-            </div>
-            <div class="field-hint" id="hint-cep"></div>
-          </div>
-          <div class="field col-span-2">
-            <label>Logradouro</label>
-            <input type="text" id="end-rua" placeholder="Rua, Avenida...">
-          </div>
-          <div class="field">
-            <label>Número</label>
-            <input type="text" id="end-numero" placeholder="Nº">
-          </div>
-          <div class="field">
-            <label>Complemento</label>
-            <input type="text" id="end-complemento" placeholder="Apto, Bloco...">
-          </div>
-          <div class="field">
-            <label>Bairro</label>
-            <input type="text" id="end-bairro" placeholder="Bairro">
-          </div>
-          <div class="field">
-            <label>Cidade</label>
-            <input type="text" id="end-cidade" placeholder="Cidade">
-          </div>
-          <div class="field">
-            <label>Estado</label>
-            <select id="end-uf">
-              <option value="">UF</option>
-              <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
-              <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
-              <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
-              <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
-              <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-              <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
-              <option>SP</option><option>SE</option><option>TO</option>
-            </select>
-          </div>
-        </div>
+  <!-- EQUIPAMENTO -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon ci-amber">🔧</div><div class="card-title">Equipamento</div></div>
+    <div class="card-body">
+      <div class="g g2">
+        <div class="field s2"><label>Descrição do Equipamento</label><input type="text" id="equip-desc" placeholder="Marca, modelo..."></div>
+        <div class="field"><label>N° Série</label><input type="text" id="equip-serie"></div>
+        <div class="field"><label>Técnico Responsável</label><input type="text" id="tecnico"></div>
+        <div class="field s2"><label>Defeito Relatado</label><textarea id="equip-defeito"></textarea></div>
+        <div class="field s2"><label>Diagnóstico Técnico</label><textarea id="equip-diag"></textarea></div>
       </div>
     </div>
+  </div>
 
-    <!-- EQUIPAMENTO -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon amber">🔧</div>
-        <div class="section-title">Equipamento / Produto</div>
-      </div>
-      <div class="section-body">
-        <div class="grid grid-3">
-          <div class="field col-span-2">
-            <label>Descrição do Equipamento</label>
-            <input type="text" id="equip-descricao" placeholder="Marca, modelo, tipo...">
-          </div>
-          <div class="field">
-            <label>Número de Série</label>
-            <input type="text" id="equip-serie" placeholder="S/N">
-          </div>
-          <div class="field col-span-3">
-            <label>Defeito Relatado pelo Cliente</label>
-            <textarea id="equip-defeito" placeholder="Descreva o problema relatado..."></textarea>
-          </div>
-          <div class="field col-span-3">
-            <label>Diagnóstico Técnico</label>
-            <textarea id="equip-diagnostico" placeholder="Análise técnica..."></textarea>
-          </div>
-        </div>
-      </div>
+  <!-- SERVIÇOS E PEÇAS -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon ci-green">📋</div>
+      <div class="card-title">Serviços e Peças</div>
+      <button class="btn btn-ghost btn-sm" onclick="abrirModalCatalogo()">📚 Catálogo</button>
     </div>
+    <div class="card-body" style="padding:0">
 
-    <!-- SERVIÇOS E PEÇAS -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon green">📋</div>
-        <div class="section-title">Serviços e Peças</div>
+      <!-- Mobile: chips rápidos do catálogo -->
+      <div style="padding:12px 16px 0">
+        <div class="section-label">Serviços rápidos do catálogo</div>
+        <div class="quick-services" id="quick-chips"></div>
       </div>
-      <table class="items-table">
-        <thead>
-          <tr>
-            <th style="width:40%">Descrição</th>
-            <th style="width:15%">Tipo</th>
-            <th style="width:12%">Qtd</th>
-            <th style="width:15%">Valor Unit.</th>
-            <th style="width:13%">Subtotal</th>
-            <th style="width:5%"></th>
-          </tr>
-        </thead>
-        <tbody id="items-tbody">
-        </tbody>
-      </table>
-      <button class="add-item-btn" onclick="addItem()">
-        <span style="font-size:18px;">+</span> Adicionar item
-      </button>
-      <div style="padding:20px 24px;">
-        <div class="grid grid-2">
-          <div class="field">
-            <label>Observações</label>
-            <textarea id="os-obs" placeholder="Observações gerais, prazo de entrega..."></textarea>
-          </div>
-          <div class="totals-box">
-            <div class="total-row">
-              <span>Subtotal Serviços</span>
-              <span id="total-servicos">R$ 0,00</span>
-            </div>
-            <div class="total-row">
-              <span>Subtotal Peças</span>
-              <span id="total-pecas">R$ 0,00</span>
-            </div>
-            <div class="total-row">
+
+      <!-- Items: mobile = cards, desktop = tabela -->
+      <div id="items-mobile" class="hidden-desktop" style="padding:12px 16px">
+        <div id="items-mcards"></div>
+        <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="addItem()">＋ Adicionar item manualmente</button>
+      </div>
+
+      <div id="items-desktop" class="hidden-mobile" style="padding-bottom:0">
+        <div class="items-wrap">
+          <table class="items">
+            <thead>
+              <tr>
+                <th style="width:35%">Descrição</th>
+                <th style="width:15%">Tipo</th>
+                <th style="width:12%">Qtd</th>
+                <th style="width:16%">Valor Unit.</th>
+                <th style="width:14%">Subtotal</th>
+                <th style="width:8%"></th>
+              </tr>
+            </thead>
+            <tbody id="items-tbody"></tbody>
+          </table>
+        </div>
+        <button class="add-row" onclick="addItem()">＋ Adicionar item</button>
+      </div>
+
+      <div style="padding:16px">
+        <div class="g g2">
+          <div class="field s2"><label>Observações</label><textarea id="os-obs"></textarea></div>
+          <div></div>
+          <div class="totals">
+            <div class="tr"><span>Serviços</span><span id="tot-serv">R$ 0,00</span></div>
+            <div class="tr"><span>Peças</span><span id="tot-peca">R$ 0,00</span></div>
+            <div class="tr">
               <span>Desconto</span>
-              <span>
-                <input type="number" id="desconto" value="0" min="0" max="100"
-                  style="background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:2px 6px;width:60px;text-align:right;"
-                  oninput="calcularTotais()"> %
+              <span class="disc-input">
+                <input type="number" id="desconto" value="0" min="0" max="100" inputmode="decimal" oninput="calcTotais()">
+                <span style="font-size:13px;color:var(--mut)">%</span>
               </span>
             </div>
-            <div class="total-row grand">
-              <span>TOTAL</span>
-              <span id="total-geral">R$ 0,00</span>
-            </div>
-            <div style="margin-top:16px;">
+            <div class="tr grand"><span>TOTAL</span><span id="tot-geral">R$ 0,00</span></div>
+            <div style="margin-top:12px">
               <div class="field">
                 <label>Forma de Pagamento</label>
-                <select id="forma-pagamento">
-                  <option>Dinheiro</option>
-                  <option>PIX</option>
-                  <option>Cartão de Débito</option>
-                  <option>Cartão de Crédito</option>
-                  <option>Boleto</option>
-                  <option>Transferência</option>
-                  <option>Parcelado</option>
+                <select id="pagamento">
+                  <option>Dinheiro</option><option>PIX</option><option>Cartão de Débito</option>
+                  <option>Cartão de Crédito</option><option>Boleto</option><option>Transferência</option><option>Parcelado</option>
                 </select>
               </div>
             </div>
@@ -816,758 +558,1275 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- TÉCNICO -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon blue">👨‍🔧</div>
-        <div class="section-title">Técnico Responsável</div>
-      </div>
-      <div class="section-body">
-        <div class="grid grid-3">
-          <div class="field">
-            <label>Técnico</label>
-            <input type="text" id="tecnico-nome" placeholder="Nome do técnico">
-          </div>
-          <div class="field">
-            <label>Previsão de Entrega</label>
-            <input type="date" id="os-data-entrega">
-          </div>
-          <div class="field">
-            <label>Prioridade</label>
-            <select id="os-prioridade">
-              <option value="Normal">Normal</option>
-              <option value="Alta">Alta</option>
-              <option value="Urgente">Urgente</option>
-              <option value="Baixa">Baixa</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- AÇÕES -->
-    <div class="flex gap-3 justify-between" style="margin-top:8px;">
-      <div class="flex gap-2">
-        <button class="btn btn-secondary" onclick="limparFormulario()">🗑 Limpar</button>
-        <button class="btn btn-secondary" onclick="previewOS()">👁 Pré-visualizar</button>
-      </div>
-      <div class="flex gap-2">
-        <button class="btn btn-primary btn-lg" onclick="salvarOS()">
-          💾 Salvar no Google Sheets
-        </button>
-      </div>
-    </div>
-
-  </div><!-- /tab nova -->
-
-  <!-- ===== TAB: LISTA ===== -->
-  <div class="tab-content" id="content-lista">
-    <div class="search-bar">
-      <input type="text" id="search-input" placeholder="🔍  Buscar por cliente, número, status..." oninput="filtrarLista()">
-      <button class="btn btn-secondary" onclick="carregarLista()">↻ Atualizar</button>
-      <button class="btn btn-primary" onclick="exportarExcel()">📊 Exportar</button>
-    </div>
-
-    <div class="section">
-      <div class="section-body" style="padding:0;" id="lista-container">
-        <div class="empty-state">
-          <div class="empty-icon">📋</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:600;margin-bottom:6px;">Nenhuma OS carregada</div>
-          <div style="font-size:13px;">Configure a URL do Apps Script e clique em Atualizar</div>
+  <!-- DATA ENTREGA / PRIORIDADE -->
+  <div class="card">
+    <div class="card-head"><div class="card-icon ci-blue">📅</div><div class="card-title">Prazo e Prioridade</div></div>
+    <div class="card-body">
+      <div class="g g2 keep">
+        <div class="field"><label>Previsão de Entrega</label><input type="date" id="os-entrega"></div>
+        <div class="field"><label>Prioridade</label>
+          <select id="prioridade"><option>Normal</option><option>Alta</option><option>Urgente</option><option>Baixa</option></select>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ===== TAB: CONFIG ===== -->
-  <div class="tab-content" id="content-config">
-    <div class="config-box">
-      <h3>🔗 Integração Google Sheets</h3>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
-        Cole abaixo a URL do seu Google Apps Script após publicar como Web App.
-        Siga o README.md para configurar o backend.
-      </p>
-      <div class="field">
-        <label>URL do Apps Script (Web App)</label>
-        <input type="url" id="config-url" placeholder="https://script.google.com/macros/s/AKfycb.../exec"
-          value="">
+  <!-- AÇÕES -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+    <button class="btn btn-ghost" onclick="limpar()">🗑 Limpar</button>
+    <button class="btn btn-purple" onclick="abrirShare()">📤 Salvar PDF / Enviar</button>
+    <button class="btn btn-primary btn-lg" style="flex:1;min-width:180px" onclick="salvarOS()">💾 Salvar no Sheets</button>
+  </div>
+
+</div>
+
+<!-- =============================== PAGE: LISTA =============================== -->
+<div class="page" id="p-lista">
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <div class="search-wrap" style="flex:1;margin-bottom:0"><input type="text" id="s-lista" placeholder="Buscar OS..." oninput="filtrarLista()"></div>
+    <button class="btn btn-ghost btn-sm" onclick="carregarLista()">↻</button>
+    <select id="filtro-status" style="background:var(--surf2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;color:var(--txt);font-size:13px;outline:none" onchange="filtrarLista()">
+      <option value="">Todos</option><option>Aberta</option><option>Em andamento</option><option>Concluída</option><option>Cancelada</option>
+    </select>
+  </div>
+  <div class="card" style="padding:0">
+    <div id="lista-cont">
+      <div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">Nenhuma OS</div><div class="empty-sub">Configure o Apps Script e atualize</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== PAGE: CLIENTES =============================== -->
+<div class="page" id="p-clientes">
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <div class="search-wrap" style="flex:1;margin-bottom:0"><input type="text" id="s-cli" placeholder="Buscar cliente..." oninput="filtrarClientes()"></div>
+    <button class="btn btn-ghost btn-sm" onclick="abrirModalNovoCliente()">＋</button>
+  </div>
+  <div class="card" style="padding:0">
+    <div id="clientes-cont">
+      <div class="empty"><div class="empty-ico">👥</div><div class="empty-txt">Nenhum cliente</div><div class="empty-sub">Os clientes são salvos automaticamente ao criar uma OS</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== PAGE: CATÁLOGO =============================== -->
+<div class="page" id="p-catalogo">
+  <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+    <div class="search-wrap" style="flex:1;margin-bottom:0"><input type="text" id="s-cat" placeholder="Buscar serviço..." oninput="filtrarCatalogo()"></div>
+    <button class="btn btn-primary btn-sm" onclick="abrirModalNovoServico()">＋ Novo</button>
+  </div>
+  <div class="card" style="padding:0">
+    <div id="catalogo-cont">
+      <div class="empty"><div class="empty-ico">🛠</div><div class="empty-txt">Catálogo vazio</div><div class="empty-sub">Cadastre seus serviços e peças para reutilizar</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================== PAGE: CONFIG =============================== -->
+<div class="page" id="p-config">
+  <div class="info-box">
+    <h4>🔗 Google Apps Script</h4>
+    <div class="field">
+      <label>URL do Web App</label>
+      <input type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/...../exec">
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon ci-blue">🏢</div><div class="card-title">Dados da Empresa</div></div>
+    <div class="card-body">
+      <div class="g g2">
+        <div class="field s2"><label>Nome da Empresa</label><input type="text" id="cfg-emp" placeholder="Empresa Ltda"></div>
+        <div class="field"><label>CNPJ / CPF</label><input type="text" id="cfg-doc"></div>
+        <div class="field"><label>Telefone</label><input type="text" id="cfg-tel"></div>
+        <div class="field s2"><label>E-mail</label><input type="email" id="cfg-email"></div>
+        <div class="field s2"><label>Endereço completo</label><input type="text" id="cfg-end"></div>
+        <div class="field s2"><label>Observação padrão nas OS</label><textarea id="cfg-obs"></textarea></div>
       </div>
     </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon blue">🏢</div>
-        <div class="section-title">Dados da Empresa</div>
-      </div>
-      <div class="section-body">
-        <div class="grid grid-3">
-          <div class="field col-span-2">
-            <label>Nome da Empresa</label>
-            <input type="text" id="config-empresa" placeholder="Empresa Ltda">
-          </div>
-          <div class="field">
-            <label>CNPJ / CPF</label>
-            <input type="text" id="config-cnpj" placeholder="00.000.000/0000-00">
-          </div>
-          <div class="field">
-            <label>Telefone</label>
-            <input type="text" id="config-tel" placeholder="(00) 00000-0000">
-          </div>
-          <div class="field col-span-2">
-            <label>E-mail</label>
-            <input type="email" id="config-email" placeholder="contato@empresa.com">
-          </div>
-          <div class="field col-span-3">
-            <label>Endereço</label>
-            <input type="text" id="config-endereco" placeholder="Rua, nº - Bairro - Cidade/UF">
-          </div>
-          <div class="field col-span-3">
-            <label>Observação padrão nas OS</label>
-            <textarea id="config-obs-padrao" placeholder="Texto padrão que aparece em todas as OS..."></textarea>
-          </div>
-        </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-icon ci-purple">🔢</div><div class="card-title">Numeração das OS</div></div>
+    <div class="card-body">
+      <div class="g g3">
+        <div class="field"><label>Próximo número</label><input type="number" id="cfg-prox" value="1" min="1" inputmode="numeric"></div>
+        <div class="field"><label>Prefixo</label><input type="text" id="cfg-pref" value="OS-"></div>
+        <div class="field"><label>Dígitos</label><input type="number" id="cfg-dig" value="5" min="3" max="10" inputmode="numeric"></div>
       </div>
     </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon purple">🔢</div>
-        <div class="section-title">Numeração</div>
-      </div>
-      <div class="section-body">
-        <div class="grid grid-3">
-          <div class="field">
-            <label>Próximo número de OS</label>
-            <input type="number" id="config-proximo-num" value="1" min="1">
-          </div>
-          <div class="field">
-            <label>Prefixo</label>
-            <input type="text" id="config-prefixo" placeholder="OS-" value="OS-">
-          </div>
-          <div class="field">
-            <label>Dígitos (zeros à esquerda)</label>
-            <input type="number" id="config-digitos" value="5" min="3" max="10">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex gap-3" style="margin-top:8px;">
-      <button class="btn btn-primary btn-lg" onclick="salvarConfig()">💾 Salvar Configurações</button>
-      <button class="btn btn-secondary" onclick="testarConexao()">🔌 Testar Conexão</button>
-    </div>
-
-    <div style="margin-top:32px;padding:20px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);">
-      <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--accent);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">📖 Como Configurar</h3>
-      <ol style="font-size:13px;color:var(--muted);line-height:2;padding-left:20px;">
-        <li>Acesse <strong style="color:var(--text);">script.google.com</strong> e crie um novo projeto</li>
-        <li>Cole o conteúdo do arquivo <strong style="color:var(--text);">Code.gs</strong> no editor</li>
-        <li>Altere a variável <strong style="color:var(--accent);">https://script.google.com/macros/s/AKfycbz0wH7jDAmCIcXwAk66HcOeydKW2EYdsgR3DMrPKf9LkMTcgH2Wdkp6v4X1DzsJlimZww/exec</strong> para o ID da sua planilha</li>
-        <li>Clique em <strong style="color:var(--text);">Implantar → Nova implantação</strong></li>
-        <li>Selecione <strong style="color:var(--text);">Aplicativo da Web</strong>, defina acesso como <strong style="color:var(--text);">Qualquer pessoa</strong></li>
-        <li>Copie a URL gerada e cole no campo acima</li>
-        <li>Hospede o <strong style="color:var(--text);">index.html</strong> no GitHub Pages</li>
+  </div>
+  <div class="g g2 keep" style="gap:10px">
+    <button class="btn btn-primary btn-lg btn-full" onclick="salvarConfig()">💾 Salvar Config</button>
+    <button class="btn btn-ghost btn-full" onclick="testarConexao()">🔌 Testar Conexão</button>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="card-head"><div class="card-icon ci-amber">📖</div><div class="card-title">Como Configurar</div></div>
+    <div class="card-body">
+      <ol style="font-size:13px;color:var(--mut);line-height:2.2;padding-left:18px">
+        <li>Crie uma <strong style="color:var(--txt)">Google Sheets</strong> e copie o ID da URL</li>
+        <li>Acesse <strong style="color:var(--txt)">script.google.com</strong> → Novo projeto</li>
+        <li>Cole o <strong style="color:var(--acc)">Code.gs</strong> e altere o SHEET_ID</li>
+        <li>Execute <strong style="color:var(--txt)">inicializarPlanilha()</strong></li>
+        <li>Implantar → Web App → acesso: <strong style="color:var(--txt)">Qualquer pessoa</strong></li>
+        <li>Cole a URL acima e teste a conexão</li>
+        <li>Publique o <strong style="color:var(--txt)">index.html</strong> no GitHub Pages</li>
       </ol>
     </div>
-
   </div>
+</div>
 
-</main>
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <div class="bnav-item active" onclick="goPage('p-nova')" id="bn-p-nova"><div class="bnav-icon">📋</div>Nova OS</div>
+  <div class="bnav-item" onclick="goPage('p-lista')" id="bn-p-lista"><div class="bnav-icon">📂</div>Ordens</div>
+  <div class="bnav-item" onclick="goPage('p-clientes')" id="bn-p-clientes"><div class="bnav-icon">👥</div>Clientes</div>
+  <div class="bnav-item" onclick="goPage('p-catalogo')" id="bn-p-catalogo"><div class="bnav-icon">🛠</div>Catálogo</div>
+  <div class="bnav-item" onclick="goPage('p-config')" id="bn-p-config"><div class="bnav-icon">⚙</div>Config</div>
+</div>
 
-<!-- MODAL PREVIEW -->
-<div id="modal-preview" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;overflow-y:auto;padding:20px;">
-  <div style="max-width:800px;margin:0 auto;background:#fff;border-radius:12px;padding:40px;color:#333;font-family:'DM Sans',sans-serif;">
-    <div id="preview-content"></div>
-    <div style="display:flex;gap:12px;margin-top:30px;justify-content:flex-end;">
-      <button onclick="fecharPreview()" style="padding:10px 20px;border:1px solid #ddd;border-radius:8px;background:transparent;cursor:pointer;">Fechar</button>
-      <button onclick="imprimirOS()" style="padding:10px 20px;background:#1a1a2e;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">🖨 Imprimir</button>
+<!-- =================== MODALS =================== -->
+
+<!-- MODAL: Buscar Cliente -->
+<div class="modal-bg" id="modal-cli">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">👥 Selecionar Cliente</span><button class="modal-close" onclick="fecharModal('modal-cli')">✕</button></div>
+    <div class="search-wrap"><input type="text" id="s-modal-cli" placeholder="Nome, CPF, CNPJ..." oninput="filtrarModalCli()"></div>
+    <div id="modal-cli-list"></div>
+  </div>
+</div>
+
+<!-- MODAL: Catálogo -->
+<div class="modal-bg" id="modal-cat">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">🛠 Selecionar Serviço</span><button class="modal-close" onclick="fecharModal('modal-cat')">✕</button></div>
+    <div class="search-wrap"><input type="text" id="s-modal-cat" placeholder="Buscar..." oninput="filtrarModalCat()"></div>
+    <div id="modal-cat-list"></div>
+  </div>
+</div>
+
+<!-- MODAL: Novo Serviço -->
+<div class="modal-bg" id="modal-new-serv">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">🛠 Serviço / Peça</span><button class="modal-close" onclick="fecharModal('modal-new-serv')">✕</button></div>
+    <div class="g" style="gap:12px">
+      <div class="field"><label>Nome / Descrição</label><input type="text" id="ns-nome" placeholder="Ex: Mão de obra, Troca de tela..."></div>
+      <div class="g g2 keep">
+        <div class="field"><label>Tipo</label>
+          <select id="ns-tipo"><option>Serviço</option><option>Peça</option><option>Deslocamento</option></select>
+        </div>
+        <div class="field"><label>Valor padrão (R$)</label>
+          <input type="number" id="ns-valor" placeholder="0,00" min="0" step="0.01" inputmode="decimal">
+        </div>
+      </div>
+      <div class="field"><label>Observação</label><textarea id="ns-obs" style="min-height:56px"></textarea></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-ghost btn-full" onclick="fecharModal('modal-new-serv')">Cancelar</button>
+      <button class="btn btn-primary btn-full" onclick="salvarServico()">Salvar Serviço</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Novo Cliente Manual -->
+<div class="modal-bg" id="modal-new-cli">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">👤 Novo Cliente</span><button class="modal-close" onclick="fecharModal('modal-new-cli')">✕</button></div>
+    <div class="g" style="gap:12px">
+      <div class="field"><label>Nome / Razão Social</label><input type="text" id="nc-nome"></div>
+      <div class="g g2 keep">
+        <div class="field"><label>CPF / CNPJ</label><input type="text" id="nc-doc"></div>
+        <div class="field"><label>Telefone</label><input type="tel" id="nc-tel"></div>
+      </div>
+      <div class="field"><label>E-mail</label><input type="email" id="nc-email"></div>
+      <div class="field"><label>Endereço</label><input type="text" id="nc-end"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-ghost btn-full" onclick="fecharModal('modal-new-cli')">Cancelar</button>
+      <button class="btn btn-primary btn-full" onclick="salvarClienteManual()">Salvar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Share / Enviar -->
+<div class="modal-bg" id="modal-share">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">📤 Salvar e Compartilhar</span><button class="modal-close" onclick="fecharModal('modal-share')">✕</button></div>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:4px">Escolha como deseja enviar a OS:</p>
+    <div class="share-grid">
+      <div class="share-btn" onclick="gerarPDF('download')">
+        <span class="share-icon">📄</span>Baixar PDF
+      </div>
+      <div class="share-btn" onclick="gerarPDF('whatsapp')">
+        <span class="share-icon">💬</span>WhatsApp
+      </div>
+      <div class="share-btn" onclick="gerarPDF('email')">
+        <span class="share-icon">📧</span>E-mail
+      </div>
+      <div class="share-btn" onclick="gerarPDF('imprimir')">
+        <span class="share-icon">🖨</span>Imprimir
+      </div>
+      <div class="share-btn" onclick="copiarLink()">
+        <span class="share-icon">🔗</span>Copiar texto
+      </div>
+      <div class="share-btn" onclick="salvarOS();fecharModal('modal-share')">
+        <span class="share-icon">💾</span>Só salvar
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--mut);margin-top:14px;text-align:center">
+      WhatsApp e E-mail abrem automaticamente com os dados da OS
+    </p>
+  </div>
+</div>
+
+<!-- MODAL: Detalhe OS -->
+<div class="modal-bg" id="modal-os-det">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-head">
+      <span class="modal-title" id="modal-det-num">OS #00001</span>
+      <button class="modal-close" onclick="fecharModal('modal-os-det')">✕</button>
+    </div>
+    <div id="modal-det-body"></div>
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="fecharModal('modal-os-det')">Fechar</button>
+      <button class="btn btn-purple btn-sm" onclick="editarOS()">✏ Editar</button>
+      <button class="btn btn-primary btn-sm" onclick="compartilharOS()">📤 Enviar</button>
     </div>
   </div>
 </div>
 
 <script>
-// ==================== CONFIG ====================
-let config = {
-  url: '',
-  empresa: 'Minha Empresa',
-  cnpj: '',
-  tel: '',
-  email: '',
-  endereco: '',
-  obsPadrao: '',
-  proximoNum: 1,
-  prefixo: 'OS-',
-  digitos: 5
+// =====================================================================
+//  STATE
+// =====================================================================
+let cfg = {
+  url:'',emp:'OS Manager',doc:'',tel:'',email:'',end:'',obs:'',
+  prox:1,pref:'OS-',dig:5
 };
-
 let items = [];
+let clientes = [];   // [{nome,doc,tel,email,cep,rua,num,comp,bairro,cidade,uf,tipo}]
+let catalogo = [];   // [{id,nome,tipo,valor,obs}]
 let listaOS = [];
+let osAtual = null;  // OS sendo visualizada/editada
+let isMobile = () => window.innerWidth < 768;
 
-// ==================== INIT ====================
+// =====================================================================
+//  INIT
+// =====================================================================
 window.addEventListener('load', () => {
-  carregarConfig();
-  setDataHoje();
+  loadConfig();
+  loadClientes();
+  loadCatalogo();
+  setHoje();
   addItem();
-  gerarNumeroOS();
+  renderQuickChips();
+  renderCatalogo();
+  renderClientes();
+
+  // responsive: show/hide desktop items vs mobile items
+  checkResponsive();
+  window.addEventListener('resize', checkResponsive);
 });
 
-function setDataHoje() {
-  const hoje = new Date().toISOString().split('T')[0];
-  document.getElementById('os-data-abertura').value = hoje;
+function checkResponsive() {
+  const mobile = isMobile();
+  document.querySelectorAll('.hidden-desktop').forEach(el => el.style.display = mobile ? '' : 'none');
+  document.querySelectorAll('.hidden-mobile').forEach(el => el.style.display = mobile ? 'none' : '');
+  renderItemsDesktop();
+  renderItemsMobile();
 }
 
-function gerarNumeroOS() {
-  const num = String(config.proximoNum).padStart(config.digitos, '0');
-  document.getElementById('os-numero').textContent = config.prefixo + num;
+// =====================================================================
+//  NAVIGATION
+// =====================================================================
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  // desktop tabs
+  document.querySelectorAll('.dtab').forEach(t => t.classList.remove('active'));
+  const dt = document.getElementById('dt-' + id);
+  if (dt) dt.classList.add('active');
+  // bottom nav
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  const bn = document.getElementById('bn-' + id);
+  if (bn) bn.classList.add('active');
+
+  if (id === 'p-lista') carregarLista();
 }
 
-// ==================== TABS ====================
-function switchTab(tab) {
-  document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('content-' + tab).classList.add('active');
-  if (tab === 'lista') carregarLista();
+function novaOS() {
+  limpar();
+  goPage('p-nova');
 }
 
-// ==================== TIPO PESSOA ====================
-function toggleTipoPessoa() {
-  const tipo = document.getElementById('tipo-pessoa').value;
-  document.getElementById('field-cpf').style.display = tipo === 'fisica' ? '' : 'none';
-  document.getElementById('field-cnpj').style.display = tipo === 'juridica' ? '' : 'none';
-  document.getElementById('field-ie').style.display = tipo === 'juridica' ? '' : 'none';
+// =====================================================================
+//  TIPO PESSOA
+// =====================================================================
+function toggleTipo() {
+  const f = document.getElementById('tipo-pessoa').value;
+  document.getElementById('f-cpf').style.display = f === 'fisica' ? '' : 'none';
+  document.getElementById('f-cnpj').style.display = f === 'juridica' ? '' : 'none';
 }
 
-// ==================== MASKS ====================
-function maskCPF(el) {
-  let v = el.value.replace(/\D/g, '').slice(0, 11);
-  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
-  else if (v.length > 3) v = v.replace(/(\d{3})(\d{0,3})/, '$1.$2');
-  el.value = v;
+// =====================================================================
+//  MASKS
+// =====================================================================
+function mCPF(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>9) v=v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+  else if(v.length>6) v=v.replace(/(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');
+  else if(v.length>3) v=v.replace(/(\d{3})(\d{0,3})/,'$1.$2');
+  el.value=v;
+}
+function mCNPJ(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,14);
+  if(v.length>12) v=v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5');
+  else if(v.length>8) v=v.replace(/(\d{2})(\d{3})(\d{3})(\d{0,4})/,'$1.$2.$3/$4');
+  else if(v.length>5) v=v.replace(/(\d{2})(\d{3})(\d{0,3})/,'$1.$2.$3');
+  else if(v.length>2) v=v.replace(/(\d{2})(\d{0,3})/,'$1.$2');
+  el.value=v;
+}
+function mCEP(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length>5) v=v.replace(/(\d{5})(\d{0,3})/,'$1-$2');
+  el.value=v;
+}
+function mTel(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length===11) v=v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  else if(v.length===10) v=v.replace(/(\d{2})(\d{4})(\d{4})/,'($1) $2-$3');
+  else if(v.length>6) v=v.replace(/(\d{2})(\d{4,5})(\d{0,4})/,'($1) $2-$3');
+  else if(v.length>2) v=v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
+  el.value=v;
 }
 
-function maskCNPJ(el) {
-  let v = el.value.replace(/\D/g, '').slice(0, 14);
-  if (v.length > 12) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-  else if (v.length > 8) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
-  else if (v.length > 5) v = v.replace(/(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
-  else if (v.length > 2) v = v.replace(/(\d{2})(\d{0,3})/, '$1.$2');
-  el.value = v;
-}
-
-function maskCEP(el) {
-  let v = el.value.replace(/\D/g, '').slice(0, 8);
-  if (v.length > 5) v = v.replace(/(\d{5})(\d{0,3})/, '$1-$2');
-  el.value = v;
-}
-
-function maskTel(el) {
-  let v = el.value.replace(/\D/g, '').slice(0, 11);
-  if (v.length === 11) v = v.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-  else if (v.length === 10) v = v.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-  else if (v.length > 6) v = v.replace(/(\d{2})(\d{4,5})(\d{0,4})/, '($1) $2-$3');
-  else if (v.length > 2) v = v.replace(/(\d{2})(\d{0,5})/, '($1) $2');
-  el.value = v;
-}
-
-// ==================== BUSCA CEP ====================
-async function buscarCEP() {
-  const cep = document.getElementById('cep').value.replace(/\D/g, '');
-  if (cep.length !== 8) return;
-
-  setFieldStatus('cep', 'loading');
+// =====================================================================
+//  API: CEP
+// =====================================================================
+async function bCEP() {
+  const cep = document.getElementById('cep').value.replace(/\D/g,'');
+  if(cep.length!==8) return;
+  setFS('cep','load');
   try {
-    const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    const data = await res.json();
-    if (data.erro) {
-      setFieldStatus('cep', 'error', 'CEP não encontrado');
-      return;
-    }
-    document.getElementById('end-rua').value = data.logradouro || '';
-    document.getElementById('end-bairro').value = data.bairro || '';
-    document.getElementById('end-cidade').value = data.localidade || '';
-    document.getElementById('end-uf').value = data.uf || '';
-    setFieldStatus('cep', 'success', `${data.localidade}/${data.uf}`);
-    document.getElementById('end-numero').focus();
-  } catch {
-    setFieldStatus('cep', 'error', 'Erro ao buscar CEP');
-  }
+    const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const d = await r.json();
+    if(d.erro){ setFS('cep','err','CEP não encontrado'); return; }
+    document.getElementById('end-rua').value = d.logradouro||'';
+    document.getElementById('end-bairro').value = d.bairro||'';
+    document.getElementById('end-cidade').value = d.localidade||'';
+    document.getElementById('end-uf').value = d.uf||'';
+    setFS('cep','ok',`${d.localidade}/${d.uf}`);
+    document.getElementById('end-num').focus();
+  } catch { setFS('cep','err','Erro ao buscar CEP'); }
 }
 
-// ==================== BUSCA CNPJ ====================
-async function buscarCNPJ() {
-  const cnpj = document.getElementById('cnpj').value.replace(/\D/g, '');
-  if (cnpj.length !== 14) return;
-
-  setFieldStatus('cnpj', 'loading');
+// =====================================================================
+//  API: CNPJ
+// =====================================================================
+async function bCNPJ() {
+  const cnpj = document.getElementById('cnpj').value.replace(/\D/g,'');
+  if(cnpj.length!==14) return;
+  setFS('cnpj','load');
   try {
-    // Usando a API pública da BrasilAPI
-    const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-
-    document.getElementById('cliente-nome').value = data.razao_social || '';
-    if (data.cep) {
-      document.getElementById('cep').value = data.cep.replace(/(\d{5})(\d{3})/, '$1-$2');
-      await buscarCEP();
-    }
-    document.getElementById('end-numero').value = data.numero || '';
-    document.getElementById('end-complemento').value = data.complemento || '';
-    if (data.email) document.getElementById('cliente-email').value = data.email;
-    if (data.ddd_telefone_1) {
-      const tel = (data.ddd_telefone_1 || '').replace(/\D/g, '');
-      document.getElementById('cliente-tel').value = tel;
-      maskTel(document.getElementById('cliente-tel'));
-    }
-
-    setFieldStatus('cnpj', 'success', data.razao_social);
-    toast('Dados da empresa preenchidos automaticamente!', 'success');
-  } catch {
-    setFieldStatus('cnpj', 'error', 'CNPJ não encontrado ou inválido');
-  }
+    const r = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+    if(!r.ok) throw new Error();
+    const d = await r.json();
+    document.getElementById('cli-nome').value = d.razao_social||'';
+    if(d.cep){ document.getElementById('cep').value = d.cep.replace(/(\d{5})(\d{3})/,'$1-$2'); await bCEP(); }
+    document.getElementById('end-num').value = d.numero||'';
+    document.getElementById('end-comp').value = d.complemento||'';
+    if(d.email) document.getElementById('cli-email').value = d.email;
+    if(d.ddd_telefone_1){ const t=(d.ddd_telefone_1||'').replace(/\D/g,''); document.getElementById('cli-tel').value=t; mTel(document.getElementById('cli-tel')); }
+    setFS('cnpj','ok',d.razao_social);
+    toast('Dados do CNPJ preenchidos!','ok');
+  } catch { setFS('cnpj','err','CNPJ não encontrado ou inválido'); }
 }
 
-// ==================== BUSCA CPF ====================
-async function buscarCPF() {
-  const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
-  if (cpf.length !== 11) return;
-  if (!validarCPF(cpf)) {
-    setFieldStatus('cpf', 'error', 'CPF inválido');
-    return;
-  }
-  setFieldStatus('cpf', 'success', 'CPF válido ✓');
+// =====================================================================
+//  CPF: validate only
+// =====================================================================
+function vCPF() {
+  const cpf = document.getElementById('cpf').value.replace(/\D/g,'');
+  if(cpf.length!==11){ return; }
+  if(validaCPF(cpf)){ setFS('cpf','ok','CPF válido ✓'); }
+  else { setFS('cpf','err','CPF inválido'); }
+}
+function validaCPF(c) {
+  if(/^(\d)\1+$/.test(c)) return false;
+  let s=0,r; for(let i=1;i<=9;i++) s+=+c[i-1]*(11-i); r=(s*10)%11; if(r===10||r===11) r=0; if(r!==+c[9]) return false;
+  s=0; for(let i=1;i<=10;i++) s+=+c[i-1]*(12-i); r=(s*10)%11; if(r===10||r===11) r=0; return r===+c[10];
 }
 
-function validarCPF(cpf) {
-  if (/^(\d)\1+$/.test(cpf)) return false;
-  let sum = 0, rest;
-  for (let i = 1; i <= 9; i++) sum += parseInt(cpf[i-1]) * (11 - i);
-  rest = (sum * 10) % 11;
-  if (rest === 10 || rest === 11) rest = 0;
-  if (rest !== parseInt(cpf[9])) return false;
-  sum = 0;
-  for (let i = 1; i <= 10; i++) sum += parseInt(cpf[i-1]) * (12 - i);
-  rest = (sum * 10) % 11;
-  if (rest === 10 || rest === 11) rest = 0;
-  return rest === parseInt(cpf[10]);
+function setFS(f,st,msg='') {
+  const sel = document.getElementById('st-'+f);
+  const hin = document.getElementById('h-'+f);
+  const inp = document.getElementById(f);
+  inp.className=''; sel.textContent=''; if(hin){hin.textContent='';hin.className='fhint';}
+  if(st==='load'){ sel.innerHTML='<div class="spin" style="width:14px;height:14px;border-width:2px;display:inline-block"></div>'; if(hin){hin.textContent='Buscando...';} }
+  else if(st==='ok'){ sel.textContent='✓'; sel.style.color='var(--ok)'; inp.classList.add('ok'); if(hin){hin.textContent=msg;hin.className='fhint ok';} }
+  else if(st==='err'){ sel.textContent='✕'; sel.style.color='var(--err)'; inp.classList.add('err'); if(hin){hin.textContent=msg;hin.className='fhint err';} }
 }
 
-function setFieldStatus(field, status, msg = '') {
-  const statusEl = document.getElementById('status-' + field);
-  const hintEl = document.getElementById('hint-' + field);
-  const inputEl = document.getElementById(field);
-
-  inputEl.className = '';
-  if (status === 'loading') {
-    statusEl.innerHTML = '<div class="spinner"></div>';
-    if (hintEl) { hintEl.textContent = 'Buscando...'; hintEl.className = 'field-hint'; }
-  } else if (status === 'success') {
-    statusEl.textContent = '✓';
-    statusEl.style.color = 'var(--success)';
-    inputEl.classList.add('success');
-    if (hintEl) { hintEl.textContent = msg; hintEl.className = 'field-hint success'; }
-  } else if (status === 'error') {
-    statusEl.textContent = '✕';
-    statusEl.style.color = 'var(--danger)';
-    inputEl.classList.add('error');
-    if (hintEl) { hintEl.textContent = msg; hintEl.className = 'field-hint error'; }
-  } else {
-    statusEl.textContent = '';
-    if (hintEl) { hintEl.textContent = ''; hintEl.className = 'field-hint'; }
-  }
-}
-
-// ==================== ITEMS ====================
-function addItem() {
-  const id = Date.now();
-  items.push({ id, descricao: '', tipo: 'Serviço', qtd: 1, valor: 0 });
-  renderItems();
+// =====================================================================
+//  ITEMS
+// =====================================================================
+function addItem(servico=null) {
+  const id = Date.now()+Math.random();
+  items.push({
+    id,
+    desc: servico ? servico.nome : '',
+    tipo: servico ? servico.tipo : 'Serviço',
+    qtd: 1,
+    valor: servico ? (parseFloat(servico.valor)||0) : 0,
+    catId: servico ? servico.id : null
+  });
+  renderItemsDesktop();
+  renderItemsMobile();
+  calcTotais();
 }
 
 function removeItem(id) {
-  items = items.filter(i => i.id !== id);
-  renderItems();
-  calcularTotais();
+  items = items.filter(i=>i.id!==id);
+  renderItemsDesktop();
+  renderItemsMobile();
+  calcTotais();
 }
 
-function renderItems() {
+function updateItem(id,field,val) {
+  const it = items.find(i=>i.id===id);
+  if(it){ it[field]=val; calcTotais(); renderItemsDesktop(); renderItemsMobile(); }
+}
+
+function renderItemsDesktop() {
+  if(isMobile()) return;
   const tbody = document.getElementById('items-tbody');
-  tbody.innerHTML = items.map(item => `
-    <tr id="row-${item.id}">
-      <td><input type="text" value="${item.descricao}" placeholder="Descrição do serviço ou peça..."
-        onchange="updateItem(${item.id},'descricao',this.value)"></td>
+  if(!tbody) return;
+  tbody.innerHTML = items.map(it => `
+    <tr>
+      <td><input type="text" value="${esc(it.desc)}" placeholder="Descrição..." onchange="updateItem(${it.id},'desc',this.value)"></td>
       <td>
-        <select style="background:transparent;border:none;color:var(--text);font-size:14px;width:100%;outline:none;"
-          onchange="updateItem(${item.id},'tipo',this.value)">
-          <option ${item.tipo==='Serviço'?'selected':''}>Serviço</option>
-          <option ${item.tipo==='Peça'?'selected':''}>Peça</option>
-          <option ${item.tipo==='Deslocamento'?'selected':''}>Deslocamento</option>
+        <select onchange="updateItem(${it.id},'tipo',this.value)">
+          <option ${it.tipo==='Serviço'?'selected':''}>Serviço</option>
+          <option ${it.tipo==='Peça'?'selected':''}>Peça</option>
+          <option ${it.tipo==='Deslocamento'?'selected':''}>Deslocamento</option>
         </select>
       </td>
-      <td><input type="number" value="${item.qtd}" min="1" style="width:60px;"
-        onchange="updateItem(${item.id},'qtd',+this.value)"></td>
-      <td><input type="number" value="${item.valor.toFixed(2)}" min="0" step="0.01" placeholder="0,00"
-        onchange="updateItem(${item.id},'valor',+this.value)"></td>
-      <td style="color:var(--accent);font-weight:500;">
-        R$ ${(item.qtd * item.valor).toFixed(2).replace('.',',')}
-      </td>
-      <td>
-        <button onclick="removeItem(${item.id})"
-          style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;padding:4px;">✕</button>
-      </td>
-    </tr>
+      <td><input type="number" value="${it.qtd}" min="1" style="width:55px" inputmode="numeric" onchange="updateItem(${it.id},'qtd',+this.value)"></td>
+      <td><input type="number" value="${it.valor.toFixed(2)}" min="0" step="0.01" inputmode="decimal" onchange="updateItem(${it.id},'valor',+this.value)"></td>
+      <td style="color:var(--ok);font-weight:600;font-size:13px">R$ ${fmtN(it.qtd*it.valor)}</td>
+      <td><button onclick="removeItem(${it.id})" style="background:none;border:none;color:var(--err);cursor:pointer;font-size:16px;padding:2px 6px">✕</button></td>
+    </tr>`).join('');
+}
+
+function renderItemsMobile() {
+  if(!isMobile()) return;
+  const cont = document.getElementById('items-mcards');
+  if(!cont) return;
+  if(items.length===0){ cont.innerHTML='<div style="text-align:center;color:var(--mut);font-size:13px;padding:12px">Nenhum item adicionado</div>'; return; }
+  cont.innerHTML = items.map(it => `
+    <div class="item-card-m">
+      <div class="item-card-m-head">
+        <select class="item-card-m-select" onchange="updateItem(${it.id},'tipo',this.value)" style="flex:0 0 100px">
+          <option ${it.tipo==='Serviço'?'selected':''}>Serviço</option>
+          <option ${it.tipo==='Peça'?'selected':''}>Peça</option>
+          <option ${it.tipo==='Deslocamento'?'selected':''}>Deslocamento</option>
+        </select>
+        <input style="flex:1" type="text" value="${esc(it.desc)}" placeholder="Descrição do serviço..." onchange="updateItem(${it.id},'desc',this.value)">
+        <button onclick="removeItem(${it.id})" style="background:none;border:none;color:var(--err);cursor:pointer;font-size:18px;padding:4px;flex-shrink:0">✕</button>
+      </div>
+      <div class="item-card-m-row">
+        <div class="field"><label>Qtd</label><input type="number" value="${it.qtd}" min="1" inputmode="numeric" onchange="updateItem(${it.id},'qtd',+this.value)" style="width:100%"></div>
+        <div class="field"><label>Valor Unit.</label><input type="number" value="${it.valor.toFixed(2)}" min="0" step="0.01" inputmode="decimal" onchange="updateItem(${it.id},'valor',+this.value)" style="width:100%"></div>
+        <div class="field"><label>Subtotal</label><input readonly value="R$ ${fmtN(it.qtd*it.valor)}" style="width:100%;color:var(--ok);font-weight:600;background:transparent;border-color:transparent"></div>
+      </div>
+    </div>`).join('');
+}
+
+function calcTotais() {
+  const desc = +document.getElementById('desconto').value||0;
+  let sv=0,sp=0;
+  items.forEach(i=>{ const s=i.qtd*i.valor; if(i.tipo==='Peça') sp+=s; else sv+=s; });
+  const tot=(sv+sp)*(1-desc/100);
+  document.getElementById('tot-serv').textContent='R$ '+fmtN(sv);
+  document.getElementById('tot-peca').textContent='R$ '+fmtN(sp);
+  document.getElementById('tot-geral').textContent='R$ '+fmtN(tot);
+}
+
+// =====================================================================
+//  QUICK CHIPS (catálogo na OS)
+// =====================================================================
+function renderQuickChips() {
+  const cont = document.getElementById('quick-chips');
+  if(!cont) return;
+  if(catalogo.length===0){
+    cont.innerHTML='<span style="font-size:12px;color:var(--mut)">Adicione serviços no Catálogo para acesso rápido aqui</span>';
+    return;
+  }
+  cont.innerHTML = catalogo.slice(0,12).map(s=>`
+    <div class="qs-chip" onclick="addItemCat(${s.id})" title="R$ ${fmtN(s.valor)}">${esc(s.nome)}</div>
   `).join('');
 }
 
-function updateItem(id, field, value) {
-  const item = items.find(i => i.id === id);
-  if (item) { item[field] = value; calcularTotais(); renderItems(); }
+function addItemCat(id) {
+  const s = catalogo.find(c=>c.id===id);
+  if(s) addItem(s);
+  toast(`${s.nome} adicionado!`,'ok');
 }
 
-function calcularTotais() {
-  const desconto = +document.getElementById('desconto').value || 0;
-  let servicos = 0, pecas = 0;
-  items.forEach(i => {
-    const sub = i.qtd * i.valor;
-    if (i.tipo === 'Peça') pecas += sub;
-    else servicos += sub;
-  });
-  const total = (servicos + pecas) * (1 - desconto / 100);
-  document.getElementById('total-servicos').textContent = 'R$ ' + servicos.toFixed(2).replace('.', ',');
-  document.getElementById('total-pecas').textContent = 'R$ ' + pecas.toFixed(2).replace('.', ',');
-  document.getElementById('total-geral').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+// =====================================================================
+//  CATÁLOGO
+// =====================================================================
+function loadCatalogo() {
+  const saved = localStorage.getItem('os_catalogo');
+  if(saved) catalogo = JSON.parse(saved);
 }
+function saveCatalogo() { localStorage.setItem('os_catalogo', JSON.stringify(catalogo)); }
 
-// ==================== SALVAR OS ====================
-async function salvarOS() {
-  if (!config.url) {
-    toast('Configure a URL do Apps Script primeiro!', 'error');
-    switchTab('config');
+function renderCatalogo(lista=null) {
+  const data = lista||catalogo;
+  const cont = document.getElementById('catalogo-cont');
+  if(!cont) return;
+  if(data.length===0){
+    cont.innerHTML='<div class="empty"><div class="empty-ico">🛠</div><div class="empty-txt">Catálogo vazio</div><div class="empty-sub">Clique em "+ Novo" para cadastrar</div></div>';
     return;
   }
+  cont.innerHTML = data.map(s=>`
+    <div class="cat-row">
+      <div class="cat-info">
+        <div class="cat-name">${esc(s.nome)}</div>
+        <div class="cat-tipo">${s.tipo} ${s.obs?'· '+esc(s.obs):''}</div>
+      </div>
+      <div class="cat-price">R$ ${fmtN(s.valor||0)}</div>
+      <button class="btn btn-primary btn-sm" onclick="addItemCat(${s.id});goPage('p-nova')">＋ Usar</button>
+      <button class="btn btn-danger btn-sm btn-icon" style="margin-left:6px" onclick="deletarServico(${s.id})">✕</button>
+    </div>`).join('');
+}
 
-  const dados = coletarDados();
-  if (!dados.clienteNome) { toast('Informe o nome do cliente!', 'error'); return; }
-  if (items.length === 0) { toast('Adicione pelo menos um item!', 'error'); return; }
+function filtrarCatalogo() {
+  const q = document.getElementById('s-cat').value.toLowerCase();
+  renderCatalogo(catalogo.filter(s=>s.nome.toLowerCase().includes(q)||s.tipo.toLowerCase().includes(q)));
+}
 
-  showLoader('Salvando OS no Google Sheets...');
-  try {
-    const res = await fetch(config.url, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'salvarOS', dados })
-    });
-    const result = await res.json();
-    if (result.success) {
-      toast('OS salva com sucesso! Nº ' + dados.numero, 'success');
-      config.proximoNum++;
-      salvarConfig(true);
-      gerarNumeroOS();
-      limparFormulario();
-    } else {
-      toast('Erro: ' + (result.error || 'Tente novamente'), 'error');
-    }
-  } catch (e) {
-    toast('Erro de conexão. Verifique a URL do Apps Script.', 'error');
-  } finally {
-    hideLoader();
+function abrirModalNovoServico(id=null) {
+  // edit mode
+  const s = id ? catalogo.find(c=>c.id===id) : null;
+  document.getElementById('ns-nome').value = s?s.nome:'';
+  document.getElementById('ns-tipo').value = s?s.tipo:'Serviço';
+  document.getElementById('ns-valor').value = s?s.valor:'';
+  document.getElementById('ns-obs').value = s?s.obs:'';
+  document.getElementById('modal-new-serv')._editId = id;
+  abrirModal('modal-new-serv');
+}
+
+function salvarServico() {
+  const nome = document.getElementById('ns-nome').value.trim();
+  if(!nome){ toast('Informe o nome do serviço!','err'); return; }
+  const obj = {
+    id: Date.now(),
+    nome,
+    tipo: document.getElementById('ns-tipo').value,
+    valor: parseFloat(document.getElementById('ns-valor').value)||0,
+    obs: document.getElementById('ns-obs').value.trim()
+  };
+  const editId = document.getElementById('modal-new-serv')._editId;
+  if(editId){ const i=catalogo.findIndex(c=>c.id===editId); if(i>-1){ obj.id=editId; catalogo[i]=obj; } }
+  else { catalogo.push(obj); }
+  saveCatalogo();
+  renderCatalogo();
+  renderQuickChips();
+  fecharModal('modal-new-serv');
+  toast('Serviço salvo!','ok');
+}
+
+function deletarServico(id) {
+  if(!confirm('Remover este serviço do catálogo?')) return;
+  catalogo = catalogo.filter(c=>c.id!==id);
+  saveCatalogo();
+  renderCatalogo();
+  renderQuickChips();
+  toast('Serviço removido','info');
+}
+
+function abrirModalCatalogo() {
+  renderModalCat(catalogo);
+  abrirModal('modal-cat');
+}
+
+function filtrarModalCat() {
+  const q = document.getElementById('s-modal-cat').value.toLowerCase();
+  renderModalCat(catalogo.filter(s=>s.nome.toLowerCase().includes(q)));
+}
+
+function renderModalCat(data) {
+  const cont = document.getElementById('modal-cat-list');
+  if(data.length===0){ cont.innerHTML='<div class="empty" style="padding:24px"><div class="empty-sub">Nenhum serviço encontrado</div></div>'; return; }
+  cont.innerHTML = data.map(s=>`
+    <div class="cat-row" onclick="addItemCat(${s.id});fecharModal('modal-cat')" style="cursor:pointer">
+      <div class="cat-info">
+        <div class="cat-name">${esc(s.nome)}</div>
+        <div class="cat-tipo">${s.tipo}</div>
+      </div>
+      <div class="cat-price">R$ ${fmtN(s.valor||0)}</div>
+    </div>`).join('');
+}
+
+// =====================================================================
+//  CLIENTES
+// =====================================================================
+function loadClientes() {
+  const saved = localStorage.getItem('os_clientes');
+  if(saved) clientes = JSON.parse(saved);
+}
+function saveClientes() { localStorage.setItem('os_clientes', JSON.stringify(clientes)); }
+
+function salvarClienteAtual() {
+  const nome = document.getElementById('cli-nome').value.trim();
+  if(!nome) return;
+  const tipo = document.getElementById('tipo-pessoa').value;
+  const doc = tipo==='fisica' ? document.getElementById('cpf').value : document.getElementById('cnpj').value;
+  // check if already exists by doc or name
+  let idx = -1;
+  if(doc) idx = clientes.findIndex(c=>c.doc===doc);
+  if(idx===-1) idx = clientes.findIndex(c=>c.nome.toLowerCase()===nome.toLowerCase());
+  const obj = {
+    id: idx>-1 ? clientes[idx].id : Date.now(),
+    nome, doc, tipo,
+    tel: document.getElementById('cli-tel').value,
+    email: document.getElementById('cli-email').value,
+    cep: document.getElementById('cep').value,
+    rua: document.getElementById('end-rua').value,
+    num: document.getElementById('end-num').value,
+    comp: document.getElementById('end-comp').value,
+    bairro: document.getElementById('end-bairro').value,
+    cidade: document.getElementById('end-cidade').value,
+    uf: document.getElementById('end-uf').value
+  };
+  if(idx>-1) clientes[idx]=obj; else clientes.unshift(obj);
+  saveClientes();
+  renderClientes();
+}
+
+function renderClientes(lista=null) {
+  const data = lista||clientes;
+  const cont = document.getElementById('clientes-cont');
+  if(!cont) return;
+  if(data.length===0){
+    cont.innerHTML='<div class="empty"><div class="empty-ico">👥</div><div class="empty-txt">Nenhum cliente</div><div class="empty-sub">Clientes são salvos ao criar uma OS</div></div>';
+    return;
   }
+  cont.innerHTML = data.map(c=>`
+    <div class="cli-row" onclick="selecionarCliente(${c.id})">
+      <div class="cli-avatar">${iniciais(c.nome)}</div>
+      <div class="cli-info">
+        <div class="cli-name">${esc(c.nome)}</div>
+        <div class="cli-doc">${c.doc||c.tel||c.email||'—'}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();selecionarCliente(${c.id});goPage('p-nova')">Nova OS</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation();deletarCliente(${c.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function filtrarClientes() {
+  const q = document.getElementById('s-cli').value.toLowerCase();
+  renderClientes(clientes.filter(c=>c.nome.toLowerCase().includes(q)||(c.doc||'').includes(q)||(c.tel||'').includes(q)));
+}
+
+function selecionarCliente(id) {
+  const c = clientes.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('tipo-pessoa').value = c.tipo||'fisica';
+  toggleTipo();
+  if(c.tipo==='juridica') document.getElementById('cnpj').value=c.doc;
+  else document.getElementById('cpf').value=c.doc;
+  document.getElementById('cli-nome').value=c.nome;
+  document.getElementById('cli-tel').value=c.tel;
+  document.getElementById('cli-email').value=c.email;
+  document.getElementById('cep').value=c.cep;
+  document.getElementById('end-rua').value=c.rua;
+  document.getElementById('end-num').value=c.num;
+  document.getElementById('end-comp').value=c.comp;
+  document.getElementById('end-bairro').value=c.bairro;
+  document.getElementById('end-cidade').value=c.cidade;
+  document.getElementById('end-uf').value=c.uf;
+  fecharModal('modal-cli');
+  toast(`Cliente ${c.nome} selecionado!`,'ok');
+}
+
+function deletarCliente(id) {
+  if(!confirm('Remover este cliente?')) return;
+  clientes = clientes.filter(c=>c.id!==id);
+  saveClientes();
+  renderClientes();
+  toast('Cliente removido','info');
+}
+
+function abrirModalCliente() {
+  renderModalCli(clientes);
+  abrirModal('modal-cli');
+}
+
+function filtrarModalCli() {
+  const q = document.getElementById('s-modal-cli').value.toLowerCase();
+  renderModalCli(clientes.filter(c=>c.nome.toLowerCase().includes(q)||(c.doc||'').includes(q)));
+}
+
+function renderModalCli(data) {
+  const cont = document.getElementById('modal-cli-list');
+  if(data.length===0){ cont.innerHTML='<div class="empty" style="padding:24px"><div class="empty-sub">Nenhum cliente encontrado</div></div>'; return; }
+  cont.innerHTML = data.map(c=>`
+    <div class="cli-row" onclick="selecionarCliente(${c.id});goPage('p-nova')" style="cursor:pointer">
+      <div class="cli-avatar">${iniciais(c.nome)}</div>
+      <div class="cli-info">
+        <div class="cli-name">${esc(c.nome)}</div>
+        <div class="cli-doc">${c.doc||c.tel||'—'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function abrirModalNovoCliente() {
+  ['nc-nome','nc-doc','nc-tel','nc-email','nc-end'].forEach(id=>document.getElementById(id).value='');
+  abrirModal('modal-new-cli');
+}
+
+function salvarClienteManual() {
+  const nome = document.getElementById('nc-nome').value.trim();
+  if(!nome){ toast('Informe o nome!','err'); return; }
+  clientes.unshift({
+    id: Date.now(), nome,
+    doc: document.getElementById('nc-doc').value,
+    tipo:'fisica',
+    tel: document.getElementById('nc-tel').value,
+    email: document.getElementById('nc-email').value,
+    cep:'',rua: document.getElementById('nc-end').value,
+    num:'',comp:'',bairro:'',cidade:'',uf:''
+  });
+  saveClientes();
+  renderClientes();
+  fecharModal('modal-new-cli');
+  toast('Cliente salvo!','ok');
+}
+
+// =====================================================================
+//  GERAR / SALVAR OS
+// =====================================================================
+function setHoje() {
+  const h = new Date().toISOString().split('T')[0];
+  document.getElementById('os-data').value = h;
+}
+
+function gerarNumOS() {
+  return cfg.pref + String(cfg.prox).padStart(cfg.dig,'0');
 }
 
 function coletarDados() {
   const tipo = document.getElementById('tipo-pessoa').value;
+  let sv=0,sp=0;
+  items.forEach(i=>{ const s=i.qtd*i.valor; if(i.tipo==='Peça') sp+=s; else sv+=s; });
+  const desc = +document.getElementById('desconto').value||0;
+  const tot=(sv+sp)*(1-desc/100);
   return {
-    numero: document.getElementById('os-numero').textContent,
+    numero: document.getElementById('os-num').textContent.trim(),
     status: document.getElementById('os-status').value,
-    dataAbertura: document.getElementById('os-data-abertura').value,
-    dataEntrega: document.getElementById('os-data-entrega').value,
-    prioridade: document.getElementById('os-prioridade').value,
+    dataAbertura: document.getElementById('os-data').value,
+    dataEntrega: document.getElementById('os-entrega').value,
+    prioridade: document.getElementById('prioridade').value,
     tipoPessoa: tipo,
-    cpf: tipo === 'fisica' ? document.getElementById('cpf').value : '',
-    cnpj: tipo === 'juridica' ? document.getElementById('cnpj').value : '',
-    clienteNome: document.getElementById('cliente-nome').value,
-    clienteTel: document.getElementById('cliente-tel').value,
-    clienteEmail: document.getElementById('cliente-email').value,
+    cpf: tipo==='fisica'?document.getElementById('cpf').value:'',
+    cnpj: tipo==='juridica'?document.getElementById('cnpj').value:'',
+    clienteNome: document.getElementById('cli-nome').value,
+    clienteTel: document.getElementById('cli-tel').value,
+    clienteEmail: document.getElementById('cli-email').value,
     cep: document.getElementById('cep').value,
     rua: document.getElementById('end-rua').value,
-    numero: document.getElementById('end-numero').value,
-    complemento: document.getElementById('end-complemento').value,
+    endNum: document.getElementById('end-num').value,
+    comp: document.getElementById('end-comp').value,
     bairro: document.getElementById('end-bairro').value,
     cidade: document.getElementById('end-cidade').value,
     uf: document.getElementById('end-uf').value,
-    equipDescricao: document.getElementById('equip-descricao').value,
+    equipDesc: document.getElementById('equip-desc').value,
     equipSerie: document.getElementById('equip-serie').value,
     equipDefeito: document.getElementById('equip-defeito').value,
-    equipDiagnostico: document.getElementById('equip-diagnostico').value,
-    items: items,
-    desconto: document.getElementById('desconto').value,
-    totalGeral: document.getElementById('total-geral').textContent,
-    formaPagamento: document.getElementById('forma-pagamento').value,
-    tecnico: document.getElementById('tecnico-nome').value,
+    equipDiag: document.getElementById('equip-diag').value,
+    tecnico: document.getElementById('tecnico').value,
+    items,
+    desconto: desc,
+    totalServicos: sv,
+    totalPecas: sp,
+    totalGeral: tot,
+    pagamento: document.getElementById('pagamento').value,
     observacoes: document.getElementById('os-obs').value,
-    empresa: config.empresa
+    empresa: cfg.emp
   };
 }
 
-// ==================== CARREGAR LISTA ====================
-async function carregarLista() {
-  if (!config.url) {
-    document.getElementById('lista-container').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔗</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:600;margin-bottom:6px;">URL não configurada</div>
-        <div style="font-size:13px;">Vá em Configurações e informe a URL do Apps Script</div>
-      </div>`;
-    return;
-  }
+async function salvarOS() {
+  const d = coletarDados();
+  if(!d.clienteNome){ toast('Informe o nome do cliente!','err'); return; }
+  if(items.length===0){ toast('Adicione pelo menos 1 item!','err'); return; }
 
-  document.getElementById('lista-container').innerHTML = `<div style="padding:40px;text-align:center;color:var(--muted);">
-    <div class="spinner" style="margin:0 auto;"></div><div style="margin-top:12px;font-size:13px;">Carregando...</div>
-  </div>`;
+  // Salva cliente localmente
+  salvarClienteAtual();
+
+  if(!cfg.url){ toast('Sem URL do Apps Script — só salvo localmente','info'); proximaOS(); return; }
+
+  showLoad('Salvando no Google Sheets...');
+  try {
+    const res = await fetch(cfg.url, {
+      method:'POST',
+      body: JSON.stringify({action:'salvarOS',dados:d})
+    });
+    const json = await res.json();
+    if(json.success){ toast('OS '+d.numero+' salva!','ok'); proximaOS(); }
+    else { toast('Erro: '+(json.error||'tente novamente'),'err'); }
+  } catch { toast('Erro de conexão. OS salva localmente.','err'); proximaOS(); }
+  finally { hideLoad(); }
+}
+
+function proximaOS() {
+  cfg.prox++;
+  salvarConfig(true);
+  document.getElementById('os-num').textContent = gerarNumOS();
+}
+
+// =====================================================================
+//  PDF + SHARE
+// =====================================================================
+function abrirShare() {
+  abrirModal('modal-share');
+}
+
+async function gerarPDF(acao) {
+  fecharModal('modal-share');
+  const d = coletarDados();
+  if(!d.clienteNome){ toast('Preencha os dados do cliente!','err'); return; }
+
+  showLoad('Gerando PDF...');
+  await new Promise(r=>setTimeout(r,100));
 
   try {
-    const res = await fetch(config.url + '?action=listarOS');
-    const result = await res.json();
-    if (result.success) {
-      listaOS = result.data || [];
-      renderLista(listaOS);
-    } else {
-      document.getElementById('lista-container').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>Erro ao carregar: ${result.error}</div></div>`;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+    const W = 210, mar = 14;
+    let y = mar;
+
+    // Header empresa
+    doc.setFillColor(12,12,20);
+    doc.rect(0,0,W,28,'F');
+    doc.setTextColor(99,201,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(16);
+    doc.text(cfg.emp, mar, 11);
+    doc.setFontSize(8);
+    doc.setTextColor(120,120,160);
+    doc.text([cfg.doc, cfg.tel, cfg.email, cfg.end].filter(Boolean).join('  |  '), mar, 18);
+    doc.setTextColor(99,201,255);
+    doc.text('ORDEM DE SERVIÇO', W-mar, 11, {align:'right'});
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(18);
+    doc.setTextColor(255,255,255);
+    doc.text(d.numero, W-mar, 21, {align:'right'});
+
+    y = 36;
+
+    // OS Info bar
+    doc.setFillColor(28,28,38);
+    doc.roundedRect(mar,y,W-mar*2,16,3,3,'F');
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(120,120,160);
+    const infos = [
+      ['Status',d.status],['Abertura',fmtData(d.dataAbertura)],
+      ['Entrega',fmtData(d.dataEntrega)||'—'],['Prioridade',d.prioridade],['Pagamento',d.pagamento]
+    ];
+    const bw = (W-mar*2)/infos.length;
+    infos.forEach(([lab,val],i)=>{
+      const x = mar + i*bw + bw/2;
+      doc.text(lab,x,y+5,{align:'center'});
+      doc.setTextColor(238,238,245);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(8);
+      doc.text(val,x,y+11,{align:'center'});
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(120,120,160);
+    });
+    y+=22;
+
+    // Cliente
+    secTitle(doc,'DADOS DO CLIENTE',y); y+=6;
+    const cli = [
+      ['Nome / Razão Social', d.clienteNome],
+      [d.tipoPessoa==='fisica'?'CPF':'CNPJ', d.cpf||d.cnpj||'—'],
+      ['Telefone', d.clienteTel||'—'],
+      ['E-mail', d.clienteEmail||'—'],
+      ['Endereço', `${d.rua||''}${d.endNum?', '+d.endNum:''} ${d.comp||''} ${d.bairro?'- '+d.bairro:''} ${d.cidade?'- '+d.cidade:''}/${d.uf||''} CEP: ${d.cep||''}`.trim()]
+    ];
+    y = tabelaDupla(doc, cli, mar, y, W-mar*2);
+    y+=6;
+
+    // Equipamento
+    secTitle(doc,'EQUIPAMENTO / PRODUTO',y); y+=6;
+    const equip = [
+      ['Equipamento',d.equipDesc||'—'],['N° Série',d.equipSerie||'—'],
+      ['Técnico',d.tecnico||'—'],['Defeito Relatado',d.equipDefeito||'—'],
+      ['Diagnóstico',d.equipDiag||'—']
+    ];
+    y = tabelaDupla(doc, equip, mar, y, W-mar*2);
+    y+=6;
+
+    // Itens
+    secTitle(doc,'SERVIÇOS E PEÇAS',y); y+=6;
+    // header
+    doc.setFillColor(22,22,34);
+    doc.rect(mar,y,W-mar*2,7,'F');
+    doc.setFontSize(7);
+    doc.setFont('helvetica','bold');
+    doc.setTextColor(99,201,255);
+    const cols=[['Descrição',70],['Tipo',28],['Qtd',16],['Valor Unit.',28],['Subtotal',28]];
+    let cx=mar+2;
+    cols.forEach(([h,w])=>{ doc.text(h,cx,y+5); cx+=w; });
+    y+=7;
+    d.items.forEach((it,idx)=>{
+      if(y>265){ doc.addPage(); y=mar; }
+      doc.setFillColor(idx%2===0?18:22, idx%2===0?18:22, idx%2===0?26:34);
+      doc.rect(mar,y,W-mar*2,7,'F');
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(8);
+      doc.setTextColor(238,238,245);
+      cx=mar+2;
+      const row=[it.desc,it.tipo,String(it.qtd),'R$ '+fmtN(it.valor),'R$ '+fmtN(it.qtd*it.valor)];
+      cols.forEach(([,w],i)=>{
+        const txt = String(row[i]||'');
+        doc.text(txt.length>36?txt.slice(0,34)+'...':txt, cx, y+5);
+        cx+=w;
+      });
+      y+=7;
+    });
+    y+=4;
+
+    // Totais
+    if(y>245) { doc.addPage(); y=mar; }
+    const totW=80;
+    const tx=W-mar-totW;
+    const totLines=[
+      ['Total Serviços','R$ '+fmtN(d.totalServicos)],
+      ['Total Peças','R$ '+fmtN(d.totalPecas)],
+      ['Desconto',d.desconto+'%'],
+    ];
+    doc.setFontSize(8);
+    totLines.forEach(([lab,val])=>{
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(120,120,160);
+      doc.text(lab,tx,y);
+      doc.setTextColor(238,238,245);
+      doc.text(val,W-mar,y,{align:'right'});
+      y+=6;
+    });
+    doc.setDrawColor(40,40,60);
+    doc.line(tx,y,W-mar,y); y+=4;
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(99,201,255);
+    doc.text('TOTAL GERAL',tx,y);
+    doc.text('R$ '+fmtN(d.totalGeral),W-mar,y,{align:'right'});
+    y+=8;
+
+    // Observações
+    if(d.observacoes){
+      secTitle(doc,'OBSERVAÇÕES',y); y+=6;
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(8);
+      doc.setTextColor(180,180,200);
+      const obsLines = doc.splitTextToSize(d.observacoes, W-mar*2);
+      doc.text(obsLines, mar, y);
+      y+=obsLines.length*5+4;
     }
-  } catch {
-    document.getElementById('lista-container').innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><div>Erro de conexão</div></div>`;
+
+    // Assinaturas
+    if(y>240) { doc.addPage(); y=mar; }
+    y = Math.max(y+10, 240);
+    doc.setDrawColor(40,40,60);
+    doc.line(mar,y,mar+60,y);
+    doc.line(W-mar-60,y,W-mar,y);
+    doc.setFontSize(7);
+    doc.setTextColor(120,120,160);
+    doc.text('Assinatura do Cliente',mar+30,y+4,{align:'center'});
+    doc.text('Assinatura do Técnico',W-mar-30,y+4,{align:'center'});
+
+    // Footer
+    doc.setFontSize(7);
+    doc.setTextColor(60,60,90);
+    doc.text('Documento gerado por OS Manager · '+new Date().toLocaleString('pt-BR'), W/2, 292, {align:'center'});
+
+    // Ação
+    const fname = `OS-${d.numero.replace(/[^a-zA-Z0-9]/g,'_')}.pdf`;
+    hideLoad();
+
+    if(acao==='download'){
+      doc.save(fname);
+      toast('PDF baixado!','ok');
+
+    } else if(acao==='whatsapp'){
+      doc.save(fname);
+      const tel = (d.clienteTel||'').replace(/\D/g,'');
+      const msg = encodeURIComponent(
+        `*${cfg.emp}* — *${d.numero}*\n\n`+
+        `👤 Cliente: ${d.clienteNome}\n`+
+        `🔧 Equip.: ${d.equipDesc}\n`+
+        `💰 Total: R$ ${fmtN(d.totalGeral)}\n`+
+        `📅 Entrega: ${fmtData(d.dataEntrega)||'a combinar'}\n`+
+        `💳 Pagto: ${d.pagamento}\n\n`+
+        `O PDF da OS foi anexado a esta mensagem.`
+      );
+      const url = tel ? `https://wa.me/55${tel}?text=${msg}` : `https://wa.me/?text=${msg}`;
+      window.open(url,'_blank');
+      toast('WhatsApp aberto! Anexe o PDF baixado.','ok');
+
+    } else if(acao==='email'){
+      doc.save(fname);
+      const subj = encodeURIComponent(`${d.numero} - ${cfg.emp}`);
+      const body = encodeURIComponent(
+        `Olá, ${d.clienteNome}!\n\n`+
+        `Segue o resumo da sua Ordem de Serviço:\n\n`+
+        `Número: ${d.numero}\n`+
+        `Equipamento: ${d.equipDesc}\n`+
+        `Total: R$ ${fmtN(d.totalGeral)}\n`+
+        `Entrega prevista: ${fmtData(d.dataEntrega)||'a combinar'}\n`+
+        `Forma de pagamento: ${d.pagamento}\n\n`+
+        `O PDF completo foi gerado — favor verificar o arquivo em anexo.\n\n`+
+        `Atenciosamente,\n${cfg.emp}\n${cfg.tel||''}\n${cfg.email||''}`
+      );
+      window.open(`mailto:${d.clienteEmail||''}?subject=${subj}&body=${body}`, '_self');
+      toast('E-mail aberto! Anexe o PDF baixado.','ok');
+
+    } else if(acao==='imprimir'){
+      doc.autoPrint();
+      window.open(doc.output('bloburl'),'_blank');
+      toast('Abrindo para impressão...','info');
+    }
+
+  } catch(e) {
+    hideLoad();
+    toast('Erro ao gerar PDF: '+e.message,'err');
+    console.error(e);
   }
 }
 
-function renderLista(data) {
-  if (data.length === 0) {
-    document.getElementById('lista-container').innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div>Nenhuma OS encontrada</div></div>`;
-    return;
-  }
-  const statusMap = { 'Aberta':'open','Em andamento':'progress','Concluída':'done','Cancelada':'cancelled' };
-  document.getElementById('lista-container').innerHTML = `
-    <table class="os-table">
-      <thead>
-        <tr>
-          <th>Nº OS</th><th>Cliente</th><th>Equipamento</th>
-          <th>Abertura</th><th>Status</th><th>Total</th><th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data.map((row, i) => `
-          <tr>
-            <td><strong style="font-family:'Syne',sans-serif;color:var(--accent);">${row[0]||''}</strong></td>
-            <td>${row[4]||''}</td>
-            <td style="color:var(--muted);">${row[14]||''}</td>
-            <td style="color:var(--muted);font-size:13px;">${row[2]||''}</td>
-            <td><span class="badge ${statusMap[row[1]]||'open'}">
-              <span class="badge-dot"></span>${row[1]||'Aberta'}
-            </span></td>
-            <td style="color:var(--accent);font-weight:500;">${row[28]||''}</td>
-            <td>
-              <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="verOS(${i})">Ver</button>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>`;
+function copiarLink() {
+  fecharModal('modal-share');
+  const d = coletarDados();
+  const txt =
+    `=== ${d.numero} - ${cfg.emp} ===\n`+
+    `Cliente: ${d.clienteNome}\n`+
+    `Tel: ${d.clienteTel}\n`+
+    `Equipamento: ${d.equipDesc}\n`+
+    `Defeito: ${d.equipDefeito}\n`+
+    `Total: R$ ${fmtN(d.totalGeral)}\n`+
+    `Pagamento: ${d.pagamento}\n`+
+    `Entrega: ${fmtData(d.dataEntrega)||'a combinar'}\n`+
+    (d.observacoes?`Obs: ${d.observacoes}`:'');
+  navigator.clipboard.writeText(txt).then(()=>toast('Texto copiado!','ok')).catch(()=>toast('Não foi possível copiar','err'));
+}
+
+// PDF helper functions
+function secTitle(doc,txt,y) {
+  doc.setFillColor(22,22,40);
+  doc.rect(14,y,182,6,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(99,201,255);
+  doc.text(txt,16,y+4.5);
+}
+function tabelaDupla(doc,rows,x,y,w) {
+  rows.forEach(([lab,val],i)=>{
+    if(y>270){doc.addPage();y=14;}
+    const bg = i%2===0?[18,18,26]:[22,22,34];
+    doc.setFillColor(...bg);
+    doc.rect(x,y,w,7,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(120,120,160);
+    doc.text(lab,x+2,y+5);
+    doc.setFont('helvetica','normal');doc.setTextColor(238,238,245);
+    const vstr=String(val||'—');
+    const safe=vstr.length>90?vstr.slice(0,88)+'...':vstr;
+    doc.text(safe,x+50,y+5);
+    y+=7;
+  });
+  return y;
+}
+
+// =====================================================================
+//  LISTA OS
+// =====================================================================
+let _listaOS=[];
+async function carregarLista() {
+  if(!cfg.url){ renderLista([]); return; }
+  document.getElementById('lista-cont').innerHTML='<div style="padding:40px;text-align:center"><div class="spin" style="margin:0 auto"></div></div>';
+  try {
+    const r = await fetch(cfg.url+'?action=listarOS');
+    const j = await r.json();
+    if(j.success){ _listaOS=j.data||[]; filtrarLista(); }
+    else renderLista([]);
+  } catch { renderLista([]); }
 }
 
 function filtrarLista() {
-  const q = document.getElementById('search-input').value.toLowerCase();
-  const filtrado = listaOS.filter(row => row.some(cell => String(cell).toLowerCase().includes(q)));
-  renderLista(filtrado);
+  const q=(document.getElementById('s-lista').value||'').toLowerCase();
+  const st=document.getElementById('filtro-status').value;
+  let data=_listaOS;
+  if(q) data=data.filter(r=>r.some(c=>String(c).toLowerCase().includes(q)));
+  if(st) data=data.filter(r=>r[1]===st);
+  renderLista(data);
 }
 
-function verOS(idx) {
-  toast('Abrindo OS...', 'info');
-}
-
-// ==================== PREVIEW & PRINT ====================
-function previewOS() {
-  const d = coletarDados();
-  const html = gerarHTMLOS(d);
-  document.getElementById('preview-content').innerHTML = html;
-  document.getElementById('modal-preview').style.display = 'block';
-}
-
-function fecharPreview() {
-  document.getElementById('modal-preview').style.display = 'none';
-}
-
-function imprimirOS() {
-  const conteudo = document.getElementById('preview-content').innerHTML;
-  const janela = window.open('', '_blank');
-  janela.document.write(`
-    <html><head><title>OS</title>
-    <style>body{font-family:Arial,sans-serif;font-size:13px;color:#333;padding:30px;}
-    h1{font-size:20px;margin-bottom:4px;} table{width:100%;border-collapse:collapse;}
-    th{background:#f5f5f5;padding:8px;text-align:left;font-size:11px;border:1px solid #ddd;}
-    td{padding:8px;border:1px solid #ddd;font-size:13px;}
-    .total{text-align:right;font-weight:bold;font-size:16px;color:#333;}
-    @media print{button{display:none;}}
-    </style></head><body>${conteudo}</body></html>`);
-  janela.document.close();
-  setTimeout(() => janela.print(), 500);
-}
-
-function gerarHTMLOS(d) {
-  const itemsHTML = (d.items||[]).map(i => `
-    <tr><td>${i.descricao}</td><td>${i.tipo}</td><td>${i.qtd}</td>
-    <td>R$ ${(+i.valor).toFixed(2)}</td>
-    <td>R$ ${(i.qtd * i.valor).toFixed(2)}</td></tr>`).join('');
-  return `
-    <div style="border-bottom:3px solid #1a1a2e;padding-bottom:20px;margin-bottom:20px;">
-      <h1 style="color:#1a1a2e;">${config.empresa}</h1>
-      <small style="color:#666;">${config.endereco} | ${config.tel} | ${config.email}</small>
-    </div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
-      <div><h2 style="font-size:18px;">ORDEM DE SERVIÇO</h2><h3 style="color:#0066cc;font-size:24px;">${d.numero}</h3></div>
-      <div style="text-align:right;">
-        <div><strong>Status:</strong> ${d.status}</div>
-        <div><strong>Abertura:</strong> ${d.dataAbertura}</div>
-        <div><strong>Entrega prevista:</strong> ${d.dataEntrega}</div>
-        <div><strong>Técnico:</strong> ${d.tecnico}</div>
-      </div>
-    </div>
-    <h4>DADOS DO CLIENTE</h4>
-    <table style="margin-bottom:16px;">
-      <tr><th width="20%">Nome</th><td colspan="3">${d.clienteNome}</td></tr>
-      <tr><th>CPF/CNPJ</th><td>${d.cpf||d.cnpj}</td><th width="15%">Telefone</th><td>${d.clienteTel}</td></tr>
-      <tr><th>E-mail</th><td colspan="3">${d.clienteEmail}</td></tr>
-      <tr><th>Endereço</th><td colspan="3">${d.rua}, ${d.numero} ${d.complemento} - ${d.bairro} - ${d.cidade}/${d.uf} - CEP: ${d.cep}</td></tr>
-    </table>
-    <h4>EQUIPAMENTO</h4>
-    <table style="margin-bottom:16px;">
-      <tr><th width="20%">Equipamento</th><td>${d.equipDescricao}</td><th width="20%">Nº Série</th><td>${d.equipSerie}</td></tr>
-      <tr><th>Defeito Relatado</th><td colspan="3">${d.equipDefeito}</td></tr>
-      <tr><th>Diagnóstico</th><td colspan="3">${d.equipDiagnostico}</td></tr>
-    </table>
-    <h4>SERVIÇOS E PEÇAS</h4>
-    <table style="margin-bottom:16px;">
-      <tr><th>Descrição</th><th>Tipo</th><th>Qtd</th><th>Valor Unit.</th><th>Subtotal</th></tr>
-      ${itemsHTML}
-    </table>
-    <div style="text-align:right;margin-bottom:20px;">
-      <div>Desconto: ${d.desconto}%</div>
-      <div class="total">TOTAL: ${d.totalGeral}</div>
-      <div>Forma de pagamento: ${d.formaPagamento}</div>
-    </div>
-    ${d.observacoes ? `<h4>OBSERVAÇÕES</h4><p>${d.observacoes}</p>` : ''}
-    <div style="margin-top:40px;display:flex;justify-content:space-between;">
-      <div style="text-align:center;border-top:1px solid #333;padding-top:8px;width:40%;">Assinatura do Cliente</div>
-      <div style="text-align:center;border-top:1px solid #333;padding-top:8px;width:40%;">Assinatura do Técnico</div>
-    </div>`;
-}
-
-// ==================== CONFIG ====================
-function salvarConfig(silent = false) {
-  config.url = document.getElementById('config-url')?.value || config.url;
-  config.empresa = document.getElementById('config-empresa')?.value || config.empresa;
-  config.cnpj = document.getElementById('config-cnpj')?.value || config.cnpj;
-  config.tel = document.getElementById('config-tel')?.value || config.tel;
-  config.email = document.getElementById('config-email')?.value || config.email;
-  config.endereco = document.getElementById('config-endereco')?.value || config.endereco;
-  config.obsPadrao = document.getElementById('config-obs-padrao')?.value || config.obsPadrao;
-  config.proximoNum = parseInt(document.getElementById('config-proximo-num')?.value) || config.proximoNum;
-  config.prefixo = document.getElementById('config-prefixo')?.value || config.prefixo;
-  config.digitos = parseInt(document.getElementById('config-digitos')?.value) || config.digitos;
-
-  localStorage.setItem('osConfig', JSON.stringify(config));
-  document.getElementById('header-empresa').textContent = config.empresa;
-  gerarNumeroOS();
-  if (!silent) toast('Configurações salvas!', 'success');
-}
-
-function carregarConfig() {
-  const saved = localStorage.getItem('osConfig');
-  if (saved) {
-    config = { ...config, ...JSON.parse(saved) };
-    document.getElementById('config-url').value = config.url;
-    document.getElementById('config-empresa').value = config.empresa;
-    document.getElementById('config-cnpj').value = config.cnpj;
-    document.getElementById('config-tel').value = config.tel;
-    document.getElementById('config-email').value = config.email;
-    document.getElementById('config-endereco').value = config.endereco;
-    document.getElementById('config-obs-padrao').value = config.obsPadrao;
-    document.getElementById('config-proximo-num').value = config.proximoNum;
-    document.getElementById('config-prefixo').value = config.prefixo;
-    document.getElementById('config-digitos').value = config.digitos;
-    document.getElementById('header-empresa').textContent = config.empresa;
+function renderLista(data) {
+  const cont = document.getElementById('lista-cont');
+  if(!data||data.length===0){
+    cont.innerHTML='<div class="empty"><div class="empty-ico">📋</div><div class="empty-txt">Sem resultados</div><div class="empty-sub">Configure o Apps Script para ver as OS</div></div>';
+    return;
   }
-  if (config.obsPadrao) document.getElementById('os-obs').value = config.obsPadrao;
+  const bmap={Aberta:'b-open','Em andamento':'b-prog',Concluída:'b-done',Cancelada:'b-cancel'};
+  cont.innerHTML=data.map((r,i)=>`
+    <div class="os-row" onclick="verOS(${i})">
+      <div class="os-row-main">
+        <div class="os-row-num">${r[0]||'—'}</div>
+        <div class="os-row-cli">${r[4]||'—'}</div>
+        <div class="os-row-equip">${r[17]||''}</div>
+      </div>
+      <div class="os-row-right">
+        <div class="os-row-val">${r[27]||''}</div>
+        <span class="badge ${bmap[r[1]]||'b-open'}"><span class="bdot"></span>${r[1]||'Aberta'}</span>
+      </div>
+    </div>`).join('');
+}
+
+let _osIdx=-1;
+function verOS(i) {
+  _osIdx=i;
+  const r=_listaOS[i];
+  document.getElementById('modal-det-num').textContent=r[0];
+  document.getElementById('modal-det-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:12px">
+      <div><span style="color:var(--mut);font-size:11px">CLIENTE</span><br><strong>${r[4]||'—'}</strong></div>
+      <div><span style="color:var(--mut);font-size:11px">STATUS</span><br>${r[1]||'—'}</div>
+      <div><span style="color:var(--mut);font-size:11px">TELEFONE</span><br>${r[8]||'—'}</div>
+      <div><span style="color:var(--mut);font-size:11px">DATA ABERTURA</span><br>${r[2]||'—'}</div>
+      <div style="grid-column:span 2"><span style="color:var(--mut);font-size:11px">EQUIPAMENTO</span><br>${r[17]||'—'}</div>
+      <div style="grid-column:span 2"><span style="color:var(--mut);font-size:11px">TOTAL</span><br><strong style="color:var(--ok);font-size:18px">${r[27]||'—'}</strong></div>
+    </div>`;
+  abrirModal('modal-os-det');
+}
+function editarOS(){ fecharModal('modal-os-det'); toast('Para editar, crie uma nova OS com o mesmo número','info'); }
+function compartilharOS(){ fecharModal('modal-os-det'); abrirShare(); }
+
+// =====================================================================
+//  CONFIG
+// =====================================================================
+function loadConfig() {
+  const s=localStorage.getItem('os_cfg');
+  if(s){ cfg={...cfg,...JSON.parse(s)}; }
+  applyConfig();
+  gerarNumDisplay();
+}
+
+function applyConfig() {
+  ['cfg-url','cfg-emp','cfg-doc','cfg-tel','cfg-email','cfg-end','cfg-obs','cfg-prox','cfg-pref','cfg-dig'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    const key={'cfg-url':'url','cfg-emp':'emp','cfg-doc':'doc','cfg-tel':'tel','cfg-email':'email','cfg-end':'end','cfg-obs':'obs','cfg-prox':'prox','cfg-pref':'pref','cfg-dig':'dig'}[id];
+    el.value=cfg[key]||'';
+  });
+  document.getElementById('h-empresa').textContent=cfg.emp||'OS Manager';
+  if(cfg.obs) document.getElementById('os-obs').value=cfg.obs;
+}
+
+function salvarConfig(silent=false) {
+  const map={'cfg-url':'url','cfg-emp':'emp','cfg-doc':'doc','cfg-tel':'tel','cfg-email':'email','cfg-end':'end','cfg-obs':'obs','cfg-prox':'prox','cfg-pref':'pref','cfg-dig':'dig'};
+  Object.entries(map).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el){ cfg[key]=el.type==='number'?+el.value:el.value; }
+  });
+  localStorage.setItem('os_cfg',JSON.stringify(cfg));
+  document.getElementById('h-empresa').textContent=cfg.emp||'OS Manager';
+  gerarNumDisplay();
+  if(!silent) toast('Configurações salvas!','ok');
+}
+
+function gerarNumDisplay() {
+  document.getElementById('os-num').textContent = gerarNumOS();
 }
 
 async function testarConexao() {
-  const url = document.getElementById('config-url').value;
-  if (!url) { toast('Informe a URL primeiro!', 'error'); return; }
-  showLoader('Testando conexão...');
+  const url=document.getElementById('cfg-url').value;
+  if(!url){toast('Informe a URL!','err');return;}
+  showLoad('Testando...');
   try {
-    const res = await fetch(url + '?action=ping');
-    const data = await res.json();
-    if (data.pong) toast('✅ Conexão com Google Sheets OK!', 'success');
-    else toast('⚠️ Conexão estabelecida mas resposta inesperada', 'info');
-  } catch {
-    toast('❌ Falha na conexão. Verifique a URL e as permissões.', 'error');
-  } finally {
-    hideLoader();
-  }
+    const r=await fetch(url+'?action=ping');
+    const j=await r.json();
+    hideLoad();
+    if(j.pong) toast('✅ Conexão OK!','ok');
+    else toast('⚠️ Conectado mas resposta inesperada','info');
+  } catch { hideLoad(); toast('❌ Falha na conexão','err'); }
 }
 
-// ==================== LIMPAR ====================
-function novaOS() {
-  limparFormulario();
-  switchTab('nova');
-}
-
-function limparFormulario() {
-  ['cpf','cnpj','cliente-nome','cliente-tel','cliente-email','cliente-ie',
-   'cep','end-rua','end-numero','end-complemento','end-bairro','end-cidade',
-   'equip-descricao','equip-serie','equip-defeito','equip-diagnostico',
-   'tecnico-nome','os-data-entrega','os-obs'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  document.getElementById('end-uf').value = '';
-  document.getElementById('os-status').value = 'Aberta';
-  document.getElementById('forma-pagamento').value = 'Dinheiro';
-  document.getElementById('desconto').value = 0;
-  ['status-cpf','status-cnpj','status-cep'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = '';
-  });
-  items = [];
+// =====================================================================
+//  LIMPAR FORMULÁRIO
+// =====================================================================
+function limpar() {
+  const ids=['cpf','cnpj','cli-nome','cli-tel','cli-email','cep','end-rua','end-num','end-comp','end-bairro','end-cidade','equip-desc','equip-serie','equip-defeito','equip-diag','tecnico','os-entrega'];
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('end-uf').value='';
+  document.getElementById('os-status').value='Aberta';
+  document.getElementById('pagamento').value='Dinheiro';
+  document.getElementById('desconto').value='0';
+  document.getElementById('prioridade').value='Normal';
+  ['st-cpf','st-cnpj','st-cep'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='';});
+  items=[];
   addItem();
-  calcularTotais();
-  setDataHoje();
-  gerarNumeroOS();
-  if (config.obsPadrao) document.getElementById('os-obs').value = config.obsPadrao;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  calcTotais();
+  setHoje();
+  gerarNumDisplay();
+  if(cfg.obs) document.getElementById('os-obs').value=cfg.obs;
+  else document.getElementById('os-obs').value='';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function exportarExcel() {
-  if (!config.url) { toast('Configure a URL do Apps Script!', 'error'); return; }
-  window.open(config.url + '?action=exportar', '_blank');
+// =====================================================================
+//  MODALS
+// =====================================================================
+function abrirModal(id) {
+  const m=document.getElementById(id);
+  m.classList.add('show');
+  document.body.style.overflow='hidden';
 }
+function fecharModal(id) {
+  document.getElementById(id).classList.remove('show');
+  document.body.style.overflow='';
+}
+// fechar modal ao clicar fundo
+document.querySelectorAll('.modal-bg').forEach(m=>{
+  m.addEventListener('click', e=>{ if(e.target===m) fecharModal(m.id); });
+});
 
-// ==================== TOAST & LOADER ====================
-function toast(msg, type = 'info') {
-  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `<span>${icons[type]||'•'}</span><span>${msg}</span>`;
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(() => el.remove(), 4000);
-}
+// =====================================================================
+//  UTILS
+// =====================================================================
+function fmtN(v){ return (+v||0).toFixed(2).replace('.',','); }
+function fmtData(d){ if(!d) return ''; try{ const [a,m,dia]=d.split('-'); return `${dia}/${m}/${a}`; }catch{return d;} }
+function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function iniciais(nome){ return (nome||'?').split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase(); }
 
-function showLoader(txt = 'Carregando...') {
-  document.getElementById('loader-text').textContent = txt;
-  document.getElementById('loader').classList.add('show');
+function toast(msg,type='info') {
+  const icons={ok:'✅',err:'❌',info:'ℹ️'};
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<span>${icons[type]||'•'}</span><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),3800);
 }
-
-function hideLoader() {
-  document.getElementById('loader').classList.remove('show');
-}
+function showLoad(txt='Carregando...') { document.getElementById('ltxt').textContent=txt; document.getElementById('loader').classList.add('show'); }
+function hideLoad() { document.getElementById('loader').classList.remove('show'); }
 </script>
 </body>
 </html>
