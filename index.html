@@ -251,6 +251,7 @@ table.items select option{background:var(--surf2)}
 .cat-name{font-size:14px;font-weight:500}
 .cat-tipo{font-size:11px;color:var(--mut)}
 .cat-price{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--ok);flex-shrink:0;margin-right:8px}
+.row-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
 
 /* MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:flex-end;justify-content:center}
@@ -808,6 +809,10 @@ let clientes = [];   // [{nome,doc,tel,email,cep,rua,num,comp,bairro,cidade,uf,t
 let catalogo = [];   // [{id,nome,tipo,valor,obs}]
 let listaOS = [];
 let osAtual = null;  // OS sendo visualizada/editada
+const STORAGE_CFG = 'os_cfg';
+const STORAGE_CLIENTES = 'os_clientes';
+const STORAGE_CATALOGO = 'os_catalogo';
+const STORAGE_OS = 'os_local_orders';
 let isMobile = () => window.innerWidth < 768;
 
 // =====================================================================
